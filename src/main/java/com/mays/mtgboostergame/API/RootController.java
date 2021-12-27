@@ -6,7 +6,10 @@ import io.magicthegathering.javasdk.api.CardAPI;
 import io.magicthegathering.javasdk.resource.Card;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Optional;
@@ -17,6 +20,14 @@ public class RootController {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final DeckRepository deckRepository;
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
+    @Autowired
+    public RestTemplate restTemplate;
 
     @Autowired
     public RootController(CardRepository cardRepository
@@ -69,6 +80,10 @@ public class RootController {
 
         Optional<Deck> activeDeck = deckRepository.findById(id);
 
+        MagicIMG newCardsPng = restTemplate.getForObject(
+                "https://api.scryfall.com/cards/multiverse/" + multiverseID, MagicIMG.class
+        );
+
         Optional<MyCard> cardToAdd = cardRepository.existsById(multiverseID)
                 ? cardRepository.findById(multiverseID)
                 : Optional.of(new MyCard(CardAPI.getCard(multiverseID), activeDeck.get()));
@@ -90,6 +105,13 @@ public class RootController {
         MyCard cardToAdd = new MyCard(CardAPI.getCard(id), activeDeck);
         cardRepository.save(cardToAdd);
         return "saved";
+    }
+    @GetMapping("/test")
+    public String test() {
+        MagicIMG newCardsPng = restTemplate.getForObject(
+                "https://api.scryfall.com/cards/multiverse/409574", MagicIMG.class
+        );
+        return newCardsPng.getPng();
     }
 
 }

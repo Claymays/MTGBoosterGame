@@ -8,8 +8,10 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Optional;
@@ -40,14 +42,14 @@ public class RootController {
     }
 
 
-    @PostMapping("/register")
+    @PostMapping("/create/user")
     public Integer createUser(@RequestParam(value = "name") String username, @RequestParam(value = "pass") String password) {
         User newUser = new User(username, password);
         User user = userRepository.save(newUser);
         return user.getId();
     }
 
-    @PostMapping("/createDeck")
+    @PostMapping("/create/deck")
     public @ResponseBody String createDeck(@RequestParam(value = "deckName") String deckName, @RequestParam(value = "user") Integer userID) {
         if (userRepository.existsById(userID)) {
             Optional<User> user = userRepository.findById(userID);
@@ -72,13 +74,19 @@ public class RootController {
         return "Deck not found";
     }
 
-    @PostMapping("/addCardToDeck")
-    public void addToDeck(
-              @RequestParam(value = "deckID") Integer id
+    @PostMapping("/update/deck/{id}")
+    public ResponseEntity<Deck> addToDeck(
+              @PathVariable Integer id
             , @RequestParam(value = "multiverseID") Integer multiverseID
             , @RequestParam(value = "quantity") Integer quantity) {
 
-        Optional<Deck> activeDeck = deckRepository.findById(id);
+        Optional<Deck> activeDeck;
+
+        if (deckRepository.existsById(id)) {
+            activeDeck = deckRepository.findById(id);
+        } else {
+            return
+        }
 
         MagicIMG newCardsPng = restTemplate.getForObject(
                 "https://api.scryfall.com/cards/multiverse/" + multiverseID, MagicIMG.class
@@ -86,7 +94,7 @@ public class RootController {
 
         Optional<MyCard> cardToAdd = cardRepository.existsById(multiverseID)
                 ? cardRepository.findById(multiverseID)
-                : Optional.of(new MyCard(CardAPI.getCard(multiverseID), activeDeck.get()));
+                : Optional.of(new MyCard(CardAPI.getCard(multiverseID), activeDeck.get(), newCardsPng.getImageUris().getPng()));
 
         for (int i = quantity; i > 0; i--) {
             cardRepository.save(cardToAdd.get());
@@ -96,22 +104,15 @@ public class RootController {
 
     @GetMapping("/card/{id}")
     public @ResponseBody Optional<MyCard> getCard(@PathVariable Integer id) {
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/").build().toUri();
         return cardRepository.findById(id);
     }
 
-    @PostMapping("/card/{id}")
-    public @ResponseBody String addCard (@PathVariable Integer id, @RequestParam Integer deckID) {
-        Deck activeDeck = deckRepository.findById(deckID).get();
-        MyCard cardToAdd = new MyCard(CardAPI.getCard(id), activeDeck);
-        cardRepository.save(cardToAdd);
-        return "saved";
-    }
-    @GetMapping("/test")
-    public String test() {
-        MagicIMG newCardsPng = restTemplate.getForObject(
-                "https://api.scryfall.com/cards/multiverse/409574", MagicIMG.class
-        );
-        return newCardsPng.getPng();
-    }
-
+//    @PostMapping("/card/{id}")
+//    public @ResponseBody String addCard (@PathVariable Integer id, @RequestParam Integer deckID) {
+//        Deck activeDeck = deckRepository.findById(deckID).get();
+//        MyCard cardToAdd = new MyCard(CardAPI.getCard(id), activeDeck, );
+//        cardRepository.save(cardToAdd);
+//        return "saved";
+//    }
 }

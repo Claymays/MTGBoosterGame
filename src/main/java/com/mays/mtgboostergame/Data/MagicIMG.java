@@ -1,22 +1,22 @@
 package com.mays.mtgboostergame.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MagicIMG {
-    private String png;
 
-    public MagicIMG() {}
+    @JsonProperty("image_uris")
+    private ImageUris imageUris;
 
-    public MagicIMG(String png) {
-        this.png = png;
+    @Data
+    @NoArgsConstructor
+    public static class ImageUris {
+        private String png;
     }
 
-    public String getPng() {
-        return png;
-    }
-
-    public void setPng(String png) {
-        this.png = png;
-    }
 }

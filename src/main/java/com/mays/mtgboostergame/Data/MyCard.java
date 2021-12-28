@@ -1,10 +1,14 @@
 package com.mays.mtgboostergame.Data;
 
 import io.magicthegathering.javasdk.resource.Card;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class MyCard {
 
     @Id
@@ -16,14 +20,13 @@ public class MyCard {
     private String expansion;
     @Column(length = 300)
     private String text;
+    private String pngUri;
 
     @ManyToOne
     @JoinColumn(name = "deck_id", nullable = false)
     private Deck deck;
 
-    public MyCard() {}
-
-    public MyCard(Card card, Deck deck) {
+    public MyCard(Card card, Deck deck, String pngUri) {
         String allTypes = "";
         for (String type : card.getTypes()) {
             allTypes += type;
@@ -47,59 +50,6 @@ public class MyCard {
         this.name = card.getName();
         this.text = card.getText();
         this.deck = deck;
-    }
-
-    public String getName() { return name; }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getManacost() {
-        return manacost;
-    }
-
-    public void setManacost(String manacost) {
-        this.manacost = manacost;
-    }
-
-    public String getTypes() {
-        return types;
-    }
-
-    public void setTypes(String types) {
-        this.types = types;
-    }
-
-    public String getRarity() {
-        return rarity;
-    }
-
-    public void setRarity(String rarity) {
-        this.rarity = rarity;
-    }
-
-    public String getExpansion() {
-        return expansion;
-    }
-
-    public void setExpansion(String expansion) {
-        this.expansion = expansion;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Integer getMultiverseId() {
-        return multiverseId;
-    }
-
-    public void setMultiverseId(Integer multiverseId) {
-        this.multiverseId = multiverseId;
+        this.pngUri = pngUri;
     }
 }

@@ -3,8 +3,11 @@ package com.mays.mtgboostergame.Data;
 import io.magicthegathering.javasdk.resource.Card;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -12,6 +15,9 @@ import javax.persistence.*;
 public class MyCard {
 
     @Id
+    @Column(name = "card_id")
+    @GeneratedValue
+    private Integer id;
     private Integer multiverseId;
     private String name;
     private String manacost;
@@ -22,11 +28,10 @@ public class MyCard {
     private String text;
     private String pngUri;
 
-    @ManyToOne
-    @JoinColumn(name = "deck_id", nullable = false)
-    private Deck deck;
+    @ManyToMany(mappedBy = "cardsInDeck")
+    private List<Deck> decks;
 
-    public MyCard(Card card, Deck deck, String pngUri) {
+    public MyCard(Card card, RestTemplate restTemplate) {
         String allTypes = "";
         for (String type : card.getTypes()) {
             allTypes += type;
@@ -38,18 +43,13 @@ public class MyCard {
         this.rarity = card.getRarity();
         this.name = card.getName();
         this.text = card.getText();
-        this.deck = deck;
+        this.decks = new ArrayList<>();
+        this.pngUri = restTemplate.getForObject(
+                "https://api.scryfall.com/cards/multiverse/" + card.getMultiverseid(), MagicIMG.class
+        ).getImageUris().getPng();
     }
 
-    public MyCard(MyCard card, Deck deck) {
-        this.types = card.getTypes();
-        this.expansion = card.getExpansion();
-        this.manacost = card.getManacost();
-        this.multiverseId = card.getMultiverseId();
-        this.rarity = card.getRarity();
-        this.name = card.getName();
-        this.text = card.getText();
-        this.deck = deck;
-        this.pngUri = pngUri;
+    public void setDeck(Deck deck) {
+        this.decks.add(deck);
     }
 }

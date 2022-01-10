@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -15,10 +16,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.mays.mtgboostergame.Services.DeckService.DTODeck;
+import static com.mays.mtgboostergame.Controllers.CardController.DTOCard;
 
 @NoArgsConstructor
 @RestController
@@ -26,15 +27,19 @@ import static com.mays.mtgboostergame.Services.DeckService.DTODeck;
 @AllArgsConstructor
 public class DeckController {
 
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
     private DeckService deckService;
-    @Autowired
     private UserService userService;
-    @Autowired
     private CardService cardService;
     URI uri;
+
+    @Autowired
+    public DeckController(DeckService deckService
+                        , UserService userService
+                        , CardService cardService) {
+        this.deckService = deckService;
+        this.userService = userService;
+        this.cardService = cardService;
+    }
 
     @Data
     @NoArgsConstructor
@@ -43,14 +48,14 @@ public class DeckController {
         private Integer id;
         private String deckName;
         private Integer userId;
-        private List<CardService.DTOCard> cardsInDeck;
+        private List<DTOCard> cardsInDeck;
 
         public DTODeck(Deck deck) {
             this.id = deck.getId();
             this.deckName = deck.getDeckName();
             this.userId = deck.getUser().getId();
             this.cardsInDeck = deck.getCardsInDeck().stream()
-                    .map(CardService.DTOCard::new)
+                    .map(DTOCard::new)
                     .collect(Collectors.toList());
         }
     }
@@ -58,10 +63,10 @@ public class DeckController {
 
     @PostMapping
     public ResponseEntity<DTODeck> createDeck(@RequestParam(value = "deck_name") String deckName, @RequestParam(value = "user_id") Integer userID) {
-        DTODeck deck = deckService.create(deckName, userID);
+        Optional<Deck> deck = deckService.create(deckName, userID);
         if (deck != null) {
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-            return ResponseEntity.created(uri).body(deck);
+            return ResponseEntity.created(uri).body(new DTODeck(deck.get()));
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -69,10 +74,10 @@ public class DeckController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DTODeck> getDeck(@PathVariable Integer id) {
-        DTODeck deck = deckService.get(id);
+        Optional<Deck> deck = deckService.get(id);
 
         if (deck != null) {
-            return ResponseEntity.ok(deck);
+            return ResponseEntity.ok(new DTODeck(deck.get()));
         } else {
             return ResponseEntity.notFound().build();
         }

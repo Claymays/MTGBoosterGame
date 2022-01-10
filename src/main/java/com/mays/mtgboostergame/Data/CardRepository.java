@@ -4,10 +4,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CardRepository extends CrudRepository<MyCard, Integer> {
-    Optional<MyCard> findOneByMultiverseId(Integer multiverseId);
-    Boolean existsByMultiverseId(Integer multiverseId);
+public interface CardRepository extends CrudRepository<MyCard, UUID> {
+    public Optional<MyCard> findOneByName(String name);
 }
 

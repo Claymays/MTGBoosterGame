@@ -7,6 +7,7 @@ import io.magicthegathering.javasdk.api.CardAPI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.mays.mtgboostergame.Services.DeckService.*;
 import static org.springframework.http.ResponseEntity.created;
@@ -24,11 +26,12 @@ import static org.springframework.http.ResponseEntity.notFound;
 @NoArgsConstructor
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CardService {
 
-    private final CardRepository cardRepository;
-    private final DeckService deckService;
-    private final RestTemplate restTemplate;
+    private CardRepository cardRepository;
+    private DeckService deckService;
+    private RestTemplate restTemplate;
     private URI uri;
 
     @Autowired
@@ -38,30 +41,38 @@ public class CardService {
         this.restTemplate = restTemplate;
     }
 
-    
+    public Optional<MyCard> databaseEntry(MyCard card) {
+        if (cardRepository.existsById(card.getId())) {
+            log.debug("card: " + card.getId() + " already present in database");
+            return Optional.empty();
+        } else {
+            return Optional.of(cardRepository.save(card));
+        }
+    }
 
-    public Optional<MyCard> addCarMyDeck(Integer deckId, Integer multiverseId, Integer quantity) {
-        Deck deck = deckService.get(deckId);
+    public Optional<MyCard> addCardToDeck(Integer deckId, UUID cardId, Integer quantity) {
+        Optional<Deck> deck = deckService.get(deckId);
         if (deck == null) {
             return Optional.empty();
         }
 
-        Optional<MyCard> cardOpt = cardRepository.findById(multiverseId);
-        if (cardOpt.isEmpty()) {
-            cardOpt = Optional.of(cardRepository.save(new MyCard(CardAPI.getCard(multiverseId), restTemplate)));
-        }
+        Optional<MyCard> cardOpt = cardRepository.findById(cardId);
 
 
         for (int i = 0; i < quantity; i++) {
-            deck.getCardsInDeck().add(cardOpt.get());
+            deck.get().getCardsInDeck().add(cardOpt.get());
         }
-        deckService.save(deck);
+        deckService.save(deck.get());
 
         return cardOpt;
 
     }
 
-    public Optional<MyCard> getCard(Integer id) {
+    public Optional<MyCard> getCard(UUID id) {
         return cardRepository.findById(id);
+    }
+
+    public Optional<MyCard> getCardByName(String name) {
+        return cardRepository.findOneByName(name);
     }
 }

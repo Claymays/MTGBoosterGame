@@ -1,9 +1,11 @@
 package com.mays.mtgboostergame.Data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -20,5 +22,12 @@ public class ScryFallCard {
     private String setName;
     @SerializedName("oracle_text")
     private String oracleText;
+    private String png;
+
+    @JsonProperty("image_uris")
+    public void unpackImg(Map<String, Object> images) {
+        this.png = (String) images.get("png");
+    }
+
 
 }

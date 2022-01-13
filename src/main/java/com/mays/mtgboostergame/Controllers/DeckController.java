@@ -28,17 +28,11 @@ import static com.mays.mtgboostergame.Controllers.CardController.DTOCard;
 public class DeckController {
 
     private DeckService deckService;
-    private UserService userService;
-    private CardService cardService;
     URI uri;
 
     @Autowired
-    public DeckController(DeckService deckService
-                        , UserService userService
-                        , CardService cardService) {
+    public DeckController(DeckService deckService) {
         this.deckService = deckService;
-        this.userService = userService;
-        this.cardService = cardService;
     }
 
     @Data

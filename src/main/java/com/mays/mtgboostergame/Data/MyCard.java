@@ -32,7 +32,7 @@ public class MyCard {
     private String setName;
     @Column(name = "oracle_text", length = 1000)
     private String oracleText;
-//    private String pngUri;
+    private String pngUri;
 
     @ManyToMany(mappedBy = "cardsInDeck")
     private List<Deck> decks;
@@ -46,23 +46,8 @@ public class MyCard {
         this.setName = card.getSetName();
         this.typeLine = card.getTypeLine();
         this.oracleText = card.getOracleText();
+        this.pngUri = card.getPng();
     }
-
-//    public MyCard(Card card, RestTemplate restTemplate) {
-//        String allTypes = "";
-//        for (String type : card.getTypes()) {
-//            allTypes += type + ", ";
-//        }
-//        this.types = allTypes.substring(0, allTypes.length() - 2);
-//        this.expansion = card.getSet();
-//        this.manacost = card.getManaCost();
-//        this.rarity = card.getRarity();
-//        this.name = card.getName();
-//        this.text = card.getText();
-//        this.decks = new ArrayList<>();
-//        this.pngUri = card
-//    }
-
 
     public void setDeck(Deck deck) {
         this.decks.add(deck);

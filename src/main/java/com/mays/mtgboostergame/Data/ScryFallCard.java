@@ -13,14 +13,14 @@ import java.util.UUID;
 public class ScryFallCard {
     private UUID id;
     private String name;
-    @SerializedName("mana_cost")
+    @JsonProperty("mana_cost")
     private String manaCost;
-    @SerializedName("type_line")
+    @JsonProperty("type_line")
     private String typeLine;
     private String rarity;
-    @SerializedName("set_name")
+    @JsonProperty("set_name")
     private String setName;
-    @SerializedName("oracle_text")
+    @JsonProperty("oracle_text")
     private String oracleText;
     private String png;
 

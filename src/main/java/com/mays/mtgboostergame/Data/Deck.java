@@ -1,5 +1,6 @@
 package com.mays.mtgboostergame.Data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mays.mtgboostergame.Services.DeckService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Deck {
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     private String deckName;

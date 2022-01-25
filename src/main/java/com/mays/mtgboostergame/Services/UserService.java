@@ -32,15 +32,18 @@ public class UserService {
     // TODO: Figure out how to return all of something.
 //    public ResponseEntity<List<DTOUser>>
 
-    public Optional<User> getUser(Integer id) {
-        return userRepository.findById(id);
-    }
-
     public void delete(Integer id) {
         userRepository.deleteById(id);
     }
 
     public void deleteAll() {
         userRepository.deleteAll();
+    }
+
+    public Optional<User> getUserByUsername(String username){
+        return userRepository.findOneByUsername(username);
+    }
+    public boolean userExistsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }

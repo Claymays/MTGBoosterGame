@@ -16,11 +16,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor
 @RestController
-@RequestMapping("/card")
+@RequestMapping("/api/card")
 @Slf4j
 public class CardController {
     RestTemplate restTemplate;
@@ -57,17 +58,17 @@ public class CardController {
             this.rarity = card.getRarity();
             this.expansion = card.getSetName();
             this.text = card.getOracleText();
-//            this.pngUri = card.getPngUri();
+            this.pngUri = card.getPngUri();
         }
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/")
     public ResponseEntity<DTOCard> addToDeck(
-              @PathVariable UUID cardId
+              @RequestParam String cardName
             , @RequestParam Integer deckId
             , @RequestParam(required = false, defaultValue = "1") Integer quantity) {
 
-        DTOCard card = new DTOCard(cardService.addCardToDeck(deckId, cardId, quantity).get());
+        DTOCard card = new DTOCard(cardService.addCardToDeck(deckId, cardName, quantity).get());
         if (card == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -78,16 +79,17 @@ public class CardController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DTOCard> getCard(@PathVariable UUID id) {
-        DTOCard card = new DTOCard(cardService.getCard(id).get());
-
-        if (card != null) {
-            return ResponseEntity.ok(card);
-        } else {
+        Optional<MyCard> optMyCard = cardService.getCard(id);
+        if (optMyCard.isEmpty()) {
+            log.info("Card not found with Id: {}", id);
             return ResponseEntity.notFound().build();
         }
+        MyCard unpackedCard = optMyCard.get();
+        DTOCard card = new DTOCard(unpackedCard);
+        return ResponseEntity.ok(card);
     }
 
-    @GetMapping("/name")
+    @GetMapping("/")
     public ResponseEntity<DTOCard> getByName(@RequestParam String name) {
         DTOCard card = new DTOCard(cardService.getCardByName(name).get());
         if (card == null) {

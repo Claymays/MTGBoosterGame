@@ -1,5 +1,6 @@
 package com.mays.mtgboostergame.Services;
 
+import com.mays.mtgboostergame.Controllers.DeckController;
 import com.mays.mtgboostergame.Data.Deck;
 import com.mays.mtgboostergame.Data.DeckRepository;
 import com.mays.mtgboostergame.Data.User;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.mays.mtgboostergame.Controllers.DeckController.*;
 
 @Data
 @NoArgsConstructor
@@ -25,12 +28,12 @@ public class DeckService {
     }
 
 
-    public Optional<Deck> create(String deckName, Integer userID) {
-        Optional<User> user = userService.getUser(userID);
+    public Optional<Deck> create(DeckRequestBody newDeck) {
+        Optional<User> user = userService.get(newDeck.getUserId());
         if (user.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(deckRepository.save(new Deck(user.get(), deckName)));
+            return Optional.of(deckRepository.save(new Deck(user.get(), newDeck.getDeckName())));
         }
     }
 

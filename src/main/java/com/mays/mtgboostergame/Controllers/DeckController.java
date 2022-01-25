@@ -23,7 +23,7 @@ import static com.mays.mtgboostergame.Controllers.CardController.DTOCard;
 
 @NoArgsConstructor
 @RestController
-@RequestMapping("/deck")
+@RequestMapping("/api/deck")
 @AllArgsConstructor
 public class DeckController {
 
@@ -54,10 +54,15 @@ public class DeckController {
         }
     }
 
+    @Data
+    public static class DeckRequestBody {
+        Integer userId;
+        String deckName;
+    }
 
     @PostMapping
-    public ResponseEntity<DTODeck> createDeck(@RequestParam(value = "deck_name") String deckName, @RequestParam(value = "user_id") Integer userID) {
-        Optional<Deck> deck = deckService.create(deckName, userID);
+    public ResponseEntity<DTODeck> createDeck(@RequestBody DeckRequestBody newDeck) {
+        Optional<Deck> deck = deckService.create(newDeck);
         if (deck != null) {
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
             return ResponseEntity.created(uri).body(new DTODeck(deck.get()));

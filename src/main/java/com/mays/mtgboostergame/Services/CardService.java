@@ -43,20 +43,20 @@ public class CardService {
 
     public Optional<MyCard> databaseEntry(MyCard card) {
         if (cardRepository.existsById(card.getId())) {
-            log.debug("card: " + card.getId() + " already present in database");
+            log.info("card: name: {} Id: {} already present in database", card.getName(), card.getId());
             return Optional.empty();
         } else {
             return Optional.of(cardRepository.save(card));
         }
     }
 
-    public Optional<MyCard> addCardToDeck(Integer deckId, UUID cardId, Integer quantity) {
+    public Optional<MyCard> addCardToDeck(Integer deckId, String cardName, Integer quantity) {
         Optional<Deck> deck = deckService.get(deckId);
         if (deck == null) {
             return Optional.empty();
         }
 
-        Optional<MyCard> cardOpt = cardRepository.findById(cardId);
+        Optional<MyCard> cardOpt = cardRepository.findOneByName(cardName);
 
 
         for (int i = 0; i < quantity; i++) {

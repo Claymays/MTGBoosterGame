@@ -41,13 +41,9 @@ function userAuth() {
         },
         body: JSON.stringify(params),
     })
-    .then(response => { return response.json();
-    }).then(user => {
-        loadUser(user);
-    }).then(function() {
-        loadUser();
-    });
+    .then(response => {setUser(response.json())});
 }
+
 function getCardByName() {
     var cardSearchParams = '?name=' + document.getElementById('searchBar').value;
     var searchUrl = baseUrl + '/api/card/' + cardSearchParams;
@@ -89,8 +85,7 @@ function createDeck() {
 }
 
 function setUser(user) {
-    localStorage.setItem('username', user.username);
-    localStorage.setItem('userId', user.id);
+
     user.decks.forEach(deck => {
         localStorage.setItem(deck.id, JSON.stringify(deck));
     })

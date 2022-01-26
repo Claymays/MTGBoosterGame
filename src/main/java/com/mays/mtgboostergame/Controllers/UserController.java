@@ -54,7 +54,7 @@ public class UserController {
         Optional<User> user = userService.create(newUser.username, newUser.password);
         if (user.isPresent()) {
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-            DTOUser dtoUser = new DTOUser(user.get());
+            DTOUser dtoUser = new DTOUser(user.get(), "token");
             return ResponseEntity
                     .created(uri)
                     .body(dtoUser);
@@ -70,7 +70,7 @@ public class UserController {
             User user = optUser.get();
             if (user.getPassword().equals(newUser.password)) {
                 //TODO: figure out how to generate tokens!!
-                return ResponseEntity.ok(new DTOUser(user, "login_token"));
+                return ResponseEntity.ok(new DTOUser(user, "token"));
             } else {
                 return ResponseEntity.badRequest().build();
             }
@@ -78,9 +78,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<DTOUser> getById(@PathVariable Integer id) { return ResponseEntity.ok().body(new DTOUser(userService.get(id).get())); }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteUser(@PathVariable Integer id) {

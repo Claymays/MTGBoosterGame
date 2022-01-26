@@ -11,7 +11,7 @@ public class PageController {
 
     @GetMapping("card")
     public String cardSearch() {
-        return "home";
+        return "card";
     }
 
     @GetMapping("login")

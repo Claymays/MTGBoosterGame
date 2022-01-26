@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name="USER")
@@ -31,6 +33,6 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.decks = new ArrayList<>(10);
+        this.decks = new ArrayList<>();
     }
 }

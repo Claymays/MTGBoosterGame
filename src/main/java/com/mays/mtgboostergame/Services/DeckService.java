@@ -1,10 +1,8 @@
 package com.mays.mtgboostergame.Services;
 
-import com.mays.mtgboostergame.Controllers.DeckController;
 import com.mays.mtgboostergame.Data.Deck;
 import com.mays.mtgboostergame.Data.DeckRepository;
 import com.mays.mtgboostergame.Data.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.mays.mtgboostergame.Controllers.DeckController.*;
+import static com.mays.mtgboostergame.Controllers.DeckController.DeckRequestBody;
 
 @Data
 @NoArgsConstructor

@@ -20,9 +20,10 @@ async function createUser() {
         console.log(error);
     });
     if (user != null) {
-        localStorage.setItem(user.token, JSON.stringify(user));
+        setUser(user);
     }
-    location.href = '/userPage';
+
+
 }
 
 async function userAuth() {
@@ -57,16 +58,19 @@ function loadUser() {
     const user = JSON.parse(localStorage.getItem('token'));
     const title = document.getElementById('userTitle');
     var container = document.getElementById('deckContainer');
-    const decks = user.decks || '[]';
+    const decks = user.decks || [];
 
-    title.innerHTML = user.username;
+    title.innerText = user.username;
 
     decks.forEach(deck => {
         var block = document.createElement("button");
         block.setAttribute('id', deck.id);
-        block.setAttribute('onclick', "localStorage.setItem('activeDeck', " + deck.id +"), location.href=\'/deck\'");
-        block.innerHTML = deck.deckName;
+        block.innerText = deck.deckName;
         container.appendChild(block);
+        block.addEventListener('click', function(event) {
+            localStorage.setItem('activeDeck', deck.id);
+            location.href='/deck';
+        });
     });
 }
 
@@ -92,29 +96,28 @@ async function createDeck() {
 
     user.decks.push(newDeck);
     localStorage.setItem('token', JSON.stringify(user));
-
-    var button = document.createElement('button');
-    button.setAttribute('id', newDeck.id);
-    button.setAttribute('onclick', "localStorage.setItem('activeDeck', " + newDeck.id +"), location.href=\'/deck\'");
-    button.innerHTML = newDeck.deckName;
-    var container = document.getElementById('deckContainer');
-    container.appendChild(button);
+    setUser(user);
 }
 
 function loadDeck() {
     const user = JSON.parse(localStorage.getItem('token'));
     var activeDeck = localStorage.getItem('activeDeck');
-    var deck = JSON.parse(localStorage.getItem(activeDeck));
+    var deck;
+    for (let i = 0; i < user.decks.length; i++) {
+        if (user.decks[i].id == activeDeck) {
+            deck = user.decks[i];
+        }
+    };
     var title = document.getElementById('title');
     var header = document.getElementById('deckHeader');
     const container = document.getElementById('deckContainer');
 
-    title.innerHTML = deck.deckName;
+    title.innerText = deck.deckName;
     var deckTitle = document.createElement('span');
-    deckTitle.innerHTML = deck.deckName;
+    deckTitle.innerText = deck.deckName;
     header.appendChild(deckTitle);
 
-    var cards = deck.cardsInDeck || '[]';
+    var cards = deck.cardsInDeck || [];
 
     cards.forEach(card => {
         var a = document.createElement('a');
@@ -127,22 +130,67 @@ function loadDeck() {
 
 }
 
-function deleteDeck() {
+async function deleteDeck() {
     var deckId = localStorage.getItem('activeDeck');
     var url = baseUrl + '/api/deck/' + deckId;
-    fetch(url, {
+    await fetch(url, {
         method: 'DELETE',
         });
+    var user = JSON.parse(localStorage.getItem('token'));
+    for (let i = 0; i < user.decks.length; i = i + 1) {
+        if (user.decks[i].id == deckId) {
+            user.decks.splice(i, 1);
+        }
+    }
+    localStorage.setItem(user.token, JSON.stringify(user));
     location.href = '/userPage';
 }
 
 async function cardSearch() {
+    if (localStorage.getItem('card') != null) {
+        localStorage.removeItem('card')
+        var oldCard = document.getElementById('card')
+        if (oldCard != null) {
+            oldCard.remove();
+        }
+    }
     var cardSearchParams = '?name=' + document.getElementById('searchBar').value;
     var searchUrl = baseUrl + '/api/card/' + cardSearchParams;
     const card = await fetch(searchUrl)
     .then(response => {
         return response.json();
     });
+
     localStorage.setItem('card', JSON.stringify(card));
-    location.href = '/card'
+    var header = document.getElementById('deckHeader');
+    var img = document.createElement('img');
+    img.setAttribute('id', 'card');
+    img.src = card.pngUri;
+    var add = document.createElement('button');
+    add.innerText = '+';
+    add.addEventListener('click', function() {addCardToDeck(card, JSON.parse(localStorage.getItem('activeDeck')))});
+    header.appendChild(img);
+    header.appendChild(add);
+
+}
+async function addCardToDeck(card, deckID) {
+    var params = {
+        cardName: card.name,
+        deckId: deckID
+    };
+    var user = JSON.parse(localStorage.getItem('token'));
+    for (var i = 0; i < user.decks.length; i++) {
+        if (user.decks[i].id == deckID) {
+            user.decks[i].cardsInDeck.push(card);
+            localStorage.setItem('token', JSON.stringify(user));
+        }
+    }
+    var test = await fetch('http://localhost:8080/api/card/?cardName=' + card.name + '&deckId=' + deckID,
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => {return response.json();}).then(loadDeck());
+
 }

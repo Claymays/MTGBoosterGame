@@ -3,6 +3,7 @@ package com.mays.mtgboostergame.Services;
 import com.mays.mtgboostergame.Data.CardRepository;
 import com.mays.mtgboostergame.Data.Deck;
 import com.mays.mtgboostergame.Data.MyCard;
+import com.mays.mtgboostergame.Data.ScryFallCard;
 import io.magicthegathering.javasdk.api.CardAPI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,12 +35,14 @@ public class CardService {
     private DeckService deckService;
     private RestTemplate restTemplate;
     private URI uri;
+    private String scryNameSearch;
 
     @Autowired
     public CardService(CardRepository cardRepository, DeckService deckService, RestTemplate restTemplate) {
         this.cardRepository = cardRepository;
         this.deckService = deckService;
         this.restTemplate = restTemplate;
+        this.scryNameSearch = "https://api.scryfall.com" + "/cards/named/?fuzzy=";
     }
 
     public Optional<MyCard> databaseEntry(MyCard card) {
@@ -51,13 +55,19 @@ public class CardService {
     }
 
     public Optional<MyCard> addCardToDeck(Integer deckId, String cardName, Integer quantity) {
+        scryNameSearch.concat(cardName);
         Optional<Deck> deck = deckService.get(deckId);
-        if (deck == null) {
+        if (deck.isEmpty()) {
             return Optional.empty();
         }
 
-        Optional<MyCard> cardOpt = cardRepository.findOneByName(cardName);
-
+        Optional<MyCard> cardOpt = cardRepository.findOneByNameIgnoreCase(cardName);
+        if (cardOpt.isEmpty()) {
+            cardOpt = Optional.of(new MyCard(restTemplate.getForObject(uri, ScryFallCard.class)));
+            if (cardOpt.isEmpty()) {
+                return Optional.empty();
+            }
+        }
 
         for (int i = 0; i < quantity; i++) {
             deck.get().getCardsInDeck().add(cardOpt.get());
@@ -73,6 +83,14 @@ public class CardService {
     }
 
     public Optional<MyCard> getCardByName(String name) {
-        return cardRepository.findOneByName(name);
+        Optional<MyCard> card = cardRepository.findOneByNameIgnoreCase(name);
+        if (card.isEmpty()) {
+            card = Optional.of(new MyCard(restTemplate.getForObject(scryNameSearch.concat(name), ScryFallCard.class)));
+        }
+        return card;
+    }
+
+    public void deleteAll() {
+        cardRepository.deleteAll();
     }
 }

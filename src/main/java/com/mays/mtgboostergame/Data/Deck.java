@@ -23,14 +23,24 @@ public class Deck {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST
+    })
     @JoinColumn(name="user_id", nullable = false)
     @JsonIgnore
     private User user;
 
     private String deckName;
 
-    @ManyToMany
+    @ManyToMany(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST
+    })
     @JoinTable(name = "cards_in_decks",
                 joinColumns =  @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"),
                 inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "card_id"))

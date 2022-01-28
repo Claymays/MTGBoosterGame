@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +31,12 @@ public class MyCard {
     private String oracleText;
     private String pngUri;
 
-    @ManyToMany(mappedBy = "cardsInDeck")
+    @ManyToMany(mappedBy = "cardsInDeck", cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST
+    })
     @JsonIgnore
     private List<Deck> decks;
 

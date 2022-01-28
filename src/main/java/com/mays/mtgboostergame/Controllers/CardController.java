@@ -68,17 +68,18 @@ public class CardController {
             , @RequestParam Integer deckId
             , @RequestParam(required = false, defaultValue = "1") Integer quantity) {
 
-        DTOCard card = new DTOCard(cardService.addCardToDeck(deckId, cardName, quantity).get());
-        if (card == null) {
-            return ResponseEntity.notFound().build();
-        } else {
+        Optional<MyCard> optionalMyCard = cardService.addCardToDeck(deckId, cardName, quantity);
+        if (optionalMyCard.isPresent()) {
+            DTOCard card = new DTOCard(optionalMyCard.get());
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
             return ResponseEntity.created(uri).body(card);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DTOCard> getCard(@PathVariable UUID id) {
+    public ResponseEntity<DTOCard> getById(@PathVariable UUID id) {
         Optional<MyCard> optMyCard = cardService.getCard(id);
         if (optMyCard.isEmpty()) {
             log.info("Card not found with Id: {}", id);
@@ -91,11 +92,12 @@ public class CardController {
 
     @GetMapping("/")
     public ResponseEntity<DTOCard> getByName(@RequestParam String name) {
-        DTOCard card = new DTOCard(cardService.getCardByName(name).get());
-        if (card == null) {
-            return ResponseEntity.notFound().build();
-        } else {
+        Optional<MyCard> optionalCard = cardService.getCardByName(name);
+        if (optionalCard.isPresent()) {
+            DTOCard card = new DTOCard(optionalCard.get());
             return ResponseEntity.ok(card);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 

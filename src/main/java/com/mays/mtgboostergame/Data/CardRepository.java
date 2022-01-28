@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface CardRepository extends CrudRepository<MyCard, UUID> {
-    public Optional<MyCard> findOneByName(String name);
+    public Optional<MyCard> findOneByNameIgnoreCase(String name);
 }
 

@@ -81,4 +81,15 @@ public class DeckController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Integer id) {
+        deckService.delete(id);
+        Optional<Deck> emptyDeck = deckService.get(id);
+        if (emptyDeck.isEmpty()) {
+            return ResponseEntity.ok("delete successful");
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

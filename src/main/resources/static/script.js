@@ -101,16 +101,33 @@ async function createDeck() {
 
 function loadDeck() {
     const user = JSON.parse(localStorage.getItem('token'));
-    var activeDeck = localStorage.getItem('activeDeck');
+    var enchantments = document.getElementById('enchantments');
+    var sorceries = document.getElementById('sorceries');
+    var planeswalkers = document.getElementById('planeswalkers');
+    var creatures = document.getElementById('creatures');
+    var instants = document.getElementById('instants');
+    var lands = document.getElementById('lands');
+    var artifacts = document.getElementById('artifacts');
+    var deckId = localStorage.getItem('activeDeck');
     var deck;
     for (let i = 0; i < user.decks.length; i++) {
-        if (user.decks[i].id == activeDeck) {
+        if (user.decks[i].id == deckId) {
             deck = user.decks[i];
         }
     };
     var title = document.getElementById('title');
     var header = document.getElementById('deckHeader');
     const container = document.getElementById('deckContainer');
+
+    header.innerHTML = '';
+    instants.innerHTML = '';
+    creatures.innerHTML = '';
+    sorceries.innerHTML = '';
+    lands.innerHTML = '';
+    planeswalkers.innerHTML = '';
+    artifacts.innerHTML = '';
+    enchantments.innerHTML = '';
+
 
     title.innerText = deck.deckName;
     var deckTitle = document.createElement('span');
@@ -120,12 +137,7 @@ function loadDeck() {
     var cards = deck.cardsInDeck || [];
 
     cards.forEach(card => {
-        var a = document.createElement('a');
-        a.setAttribute('href',"/card");
-        var cardElement = document.createElement('img');
-        cardElement.src = card.pngUri;
-        a.appendChild(cardElement);
-        container.appendChild(a);
+        loadCard(card);
     });
 
 }
@@ -150,6 +162,8 @@ async function cardSearch() {
     if (localStorage.getItem('card') != null) {
         localStorage.removeItem('card')
         var oldCard = document.getElementById('card')
+        var btn = document.getElementById('addButton');
+        if (btn != null) {btn.remove();}
         if (oldCard != null) {
             oldCard.remove();
         }
@@ -167,6 +181,7 @@ async function cardSearch() {
     img.setAttribute('id', 'card');
     img.src = card.pngUri;
     var add = document.createElement('button');
+    add.setAttribute('id', 'addButton');
     add.innerText = '+';
     add.addEventListener('click', function() {addCardToDeck(card, JSON.parse(localStorage.getItem('activeDeck')))});
     header.appendChild(img);
@@ -193,4 +208,50 @@ async function addCardToDeck(card, deckID) {
         },
     }).then(response => {return response.json();}).then(loadDeck());
 
+}
+
+function loadCard(card) {
+
+        var a = document.createElement('a');
+        a.setAttribute('href',"/card");
+        var cardElement = document.createElement('img');
+        cardElement.src = card.pngUri;
+
+        a.appendChild(cardElement);
+
+        if (card.typeLine.includes('creature')) {
+            creatures.innerText = 'Creatures:';
+            creatures.appendChild(a);
+            container.appendChild(creatures);
+        }
+        else if (card.typeLine.includes('planeswalker')) {
+            planeswalkers.innerText = 'Planeswalkers:';
+            planeswalkers.appendChild(a);
+            container.appendChild(planeswalkers);
+        }
+        else if (card.typeLine.includes('enchantment')) {
+            enchantments.innerText = 'Enchantments:';
+            enchantments.appendChild(a);
+            container.appendChild(enchantments)
+        }
+        else if (card.typeLine.includes('sorceries')) {
+            sorceries.innerText = 'Sorceries:';
+            sorceries.appendChild(a);
+            container.appendChild(sorceries);
+        }
+        else if (card.typeLine.includes('instant')) {
+            instants.innerText = 'Instants:';
+            instants.appendChild(a);
+            container.appendChild(instants);
+        }
+        else if (card.typeLine.includes('land')) {
+            lands.innerText = 'Lands:';
+            lands.appendChild(a);
+            container.appendChild(lands);
+        }
+        else if (card.typeLine.includes('artifact')) {
+            artifacts.innerText = 'Artifacts:';
+            artifacts.appendChild(a);
+            container.appendChild(artifacts);
+        }
 }

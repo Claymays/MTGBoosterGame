@@ -10,9 +10,24 @@
 </head>
 
 <body>
-    <h1 id="deckHeader"></h1>
+    <h1>
+        <button onclick="deleteDeck()" type="submit">Delete Deck (Don't click if there are cards in the deck!!)</button>
+        <input id="searchBar" type="text" name="searchBar">
+        <button onclick="cardSearch()">Search</button>
+    </h1>
+    <h2 id="deckHeader">
 
-    <div id="deckContainer"></div>
+    </h2>
+
+    <div id="deckContainer">
+        <div id="lands"></div>
+        <div id="creatures"></div>
+        <div id="instants"></div>
+        <div id="sorceries"></div>
+        <div id="artifacts"></div>
+        <div id="planeswalkers"></div>
+        <div id="enchantments"></div>
+    </div>
     <script src="script.js"></script>
     <script>
         window.onload = function() {

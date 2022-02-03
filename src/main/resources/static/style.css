@@ -1,4 +1,10 @@
 img, a {
-    width: 20%;
-    height: 25%
+    width: 10%;
+    height: 17%
+}
+
+.typeContainer {
+    max-width: 150px;
+    display: flex;
+    display: none;
 }

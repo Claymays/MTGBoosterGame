@@ -55,7 +55,7 @@ public class CardService {
     }
 
     public Optional<MyCard> addCardToDeck(Integer deckId, String cardName, Integer quantity) {
-        scryNameSearch.concat(cardName);
+        uri = URI.create(scryNameSearch + cardName);
         Optional<Deck> deck = deckService.get(deckId);
         if (deck.isEmpty()) {
             return Optional.empty();
@@ -67,6 +67,7 @@ public class CardService {
             if (cardOpt.isEmpty()) {
                 return Optional.empty();
             }
+            cardRepository.save(cardOpt.get());
         }
 
         for (int i = 0; i < quantity; i++) {

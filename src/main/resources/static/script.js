@@ -1,5 +1,9 @@
     'use strict'
-var baseUrl = 'http://localhost:8080';
+//import * as constants from './shared.js';
+//import { $ } from './shared.js';
+
+const baseUrl = 'http://localhost:8080';
+
 
 async function createUser() {
     var params = {
@@ -120,13 +124,6 @@ function loadDeck() {
     const container = document.getElementById('deckContainer');
 
     header.innerHTML = '';
-    instants.innerHTML = '';
-    creatures.innerHTML = '';
-    sorceries.innerHTML = '';
-    lands.innerHTML = '';
-    planeswalkers.innerHTML = '';
-    artifacts.innerHTML = '';
-    enchantments.innerHTML = '';
 
 
     title.innerText = deck.deckName;
@@ -180,14 +177,15 @@ async function cardSearch() {
     var img = document.createElement('img');
     img.setAttribute('id', 'card');
     img.src = card.pngUri;
-    var add = document.createElement('button');
-    add.setAttribute('id', 'addButton');
-    add.innerText = '+';
-    add.addEventListener('click', function() {addCardToDeck(card, JSON.parse(localStorage.getItem('activeDeck')))});
+    var addButton = document.createElement('button');
+    addButton.setAttribute('id', 'addButton');
+    addButton.innerText = '+';
+    addButton.addEventListener('click', function() {addCardToDeck(card, JSON.parse(localStorage.getItem('activeDeck')))});
     header.appendChild(img);
-    header.appendChild(add);
+    header.appendChild(addButton);
 
 }
+
 async function addCardToDeck(card, deckID) {
     var params = {
         cardName: card.name,
@@ -206,7 +204,10 @@ async function addCardToDeck(card, deckID) {
         headers: {
             'Content-Type': 'application/json',
         },
-    }).then(response => {return response.json();}).then(loadDeck());
+        body: JSON.stringify(params),
+    }).then(response => {return response.json();});
+
+    loadCard(card);
 
 }
 
@@ -216,41 +217,42 @@ function loadCard(card) {
         a.setAttribute('href',"/card");
         var cardElement = document.createElement('img');
         cardElement.src = card.pngUri;
+        var container = document.getElementById('deckContainer');
 
         a.appendChild(cardElement);
 
-        if (card.typeLine.includes('creature')) {
-            creatures.innerText = 'Creatures:';
+        if (card.typeLine.includes('Creature')) {
+            creatures.style.display = 'inline';
             creatures.appendChild(a);
             container.appendChild(creatures);
         }
-        else if (card.typeLine.includes('planeswalker')) {
-            planeswalkers.innerText = 'Planeswalkers:';
+        else if (card.typeLine.includes('Planeswalker')) {
+            planeswalkers.style.display = 'inline';
             planeswalkers.appendChild(a);
             container.appendChild(planeswalkers);
         }
-        else if (card.typeLine.includes('enchantment')) {
-            enchantments.innerText = 'Enchantments:';
+        else if (card.typeLine.includes('Enchantment')) {
+            enchantments.style.display = 'inline';
             enchantments.appendChild(a);
             container.appendChild(enchantments)
         }
-        else if (card.typeLine.includes('sorceries')) {
-            sorceries.innerText = 'Sorceries:';
+        else if (card.typeLine.includes('Sorcery')) {
+            sorceries.style.display = 'inline';
             sorceries.appendChild(a);
             container.appendChild(sorceries);
         }
-        else if (card.typeLine.includes('instant')) {
-            instants.innerText = 'Instants:';
+        else if (card.typeLine.includes('Instant')) {
+            instants.style.display = 'inline';
             instants.appendChild(a);
             container.appendChild(instants);
         }
-        else if (card.typeLine.includes('land')) {
-            lands.innerText = 'Lands:';
+        else if (card.typeLine.includes('Land')) {
+            lands.style.display = 'inline';
             lands.appendChild(a);
             container.appendChild(lands);
         }
-        else if (card.typeLine.includes('artifact')) {
-            artifacts.innerText = 'Artifacts:';
+        else if (card.typeLine.includes('Artifact')) {
+            artifacts.style.display = 'inline';
             artifacts.appendChild(a);
             container.appendChild(artifacts);
         }

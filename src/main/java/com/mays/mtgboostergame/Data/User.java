@@ -1,15 +1,12 @@
 package com.mays.mtgboostergame.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name="USER")
@@ -18,6 +15,7 @@ import java.util.Map;
 public class User {
 
     @Id
+    @Column(name = "user_id")
     @GeneratedValue
     private Integer id;
 

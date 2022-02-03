@@ -44,7 +44,7 @@ public class CardController {
         private UUID id;
         private String name;
         private String manacost;
-        private String types;
+        private String typeLine;
         private String rarity;
         private String expansion;
         private String text;
@@ -54,7 +54,7 @@ public class CardController {
             this.id = card.getId();
             this.name = card.getName();
             this.manacost = card.getManaCost();
-            this.types = card.getTypeLine();
+            this.typeLine = card.getTypeLine();
             this.rarity = card.getRarity();
             this.expansion = card.getSetName();
             this.text = card.getOracleText();

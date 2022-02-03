@@ -1,8 +1,6 @@
 package com.mays.mtgboostergame.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mays.mtgboostergame.Services.DeckService;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +8,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mays.mtgboostergame.Services.DeckService.*;
-
 @Entity
-@Table(name="DECK")
+@Table(name="DECKS")
 @Data
 @NoArgsConstructor
 public class Deck {
@@ -24,12 +20,14 @@ public class Deck {
     private Integer id;
 
     @ManyToOne(cascade = {
-            CascadeType.DETACH,
-            CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.PERSIST
+        CascadeType.MERGE,
+        CascadeType.DETACH,
+        CascadeType.PERSIST,
+        CascadeType.REFRESH,
     })
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinTable(name = "deck_table",
+    joinColumns = @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"),
+    inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
     @JsonIgnore
     private User user;
 

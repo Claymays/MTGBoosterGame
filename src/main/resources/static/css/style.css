@@ -4,7 +4,6 @@ img, a {
 }
 
 .typeContainer {
-    max-width: 150px;
     display: flex;
     display: none;
 }

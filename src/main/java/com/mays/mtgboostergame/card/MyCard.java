@@ -1,6 +1,7 @@
-package com.mays.mtgboostergame.Data;
+package com.mays.mtgboostergame.card;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mays.mtgboostergame.deck.Deck;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -31,11 +32,12 @@ public class MyCard {
     private String oracleText;
     private String pngUri;
 
-    @ManyToMany(mappedBy = "cardsInDeck", cascade = {
-            CascadeType.DETACH,
-            CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.PERSIST
+    @ManyToMany(mappedBy = "cardsInDeck",
+                cascade = {
+                CascadeType.DETACH,
+                CascadeType.MERGE,
+                CascadeType.REFRESH,
+                CascadeType.PERSIST
     })
     @JsonIgnore
     private List<Deck> decks;

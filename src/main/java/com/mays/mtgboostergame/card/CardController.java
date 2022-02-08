@@ -1,9 +1,5 @@
-package com.mays.mtgboostergame.Controllers;
+package com.mays.mtgboostergame.card;
 
-import com.mays.mtgboostergame.Data.BulkData;
-import com.mays.mtgboostergame.Data.MyCard;
-import com.mays.mtgboostergame.Data.ScryFallCard;
-import com.mays.mtgboostergame.Services.CardService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

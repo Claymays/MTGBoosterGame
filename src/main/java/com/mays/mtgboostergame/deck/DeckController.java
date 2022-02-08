@@ -1,17 +1,11 @@
-package com.mays.mtgboostergame.Controllers;
+package com.mays.mtgboostergame.deck;
 
-import com.mays.mtgboostergame.Data.Deck;
-import com.mays.mtgboostergame.Services.CardService;
-import com.mays.mtgboostergame.Services.DeckService;
-import com.mays.mtgboostergame.Services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -19,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.mays.mtgboostergame.Controllers.CardController.DTOCard;
+import static com.mays.mtgboostergame.card.CardController.DTOCard;
 
 @NoArgsConstructor
 @RestController

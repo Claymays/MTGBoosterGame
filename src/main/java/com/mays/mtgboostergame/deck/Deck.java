@@ -1,6 +1,8 @@
-package com.mays.mtgboostergame.Data;
+package com.mays.mtgboostergame.deck;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mays.mtgboostergame.card.MyCard;
+import com.mays.mtgboostergame.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,11 +35,12 @@ public class Deck {
 
     private String deckName;
 
-    @ManyToMany(cascade = {
-            CascadeType.DETACH,
-            CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.PERSIST
+    @ManyToMany(fetch = FetchType.LAZY,
+                cascade = {
+                CascadeType.DETACH,
+                CascadeType.MERGE,
+                CascadeType.REFRESH,
+                CascadeType.PERSIST
     })
     @JoinTable(name = "cards_in_decks",
                 joinColumns =  @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"),

@@ -1,18 +1,14 @@
-package com.mays.mtgboostergame.Controllers;
+package com.mays.mtgboostergame.user;
 
-import com.mays.mtgboostergame.Data.Deck;
-import com.mays.mtgboostergame.Data.User;
-import com.mays.mtgboostergame.Services.UserService;
-import lombok.AllArgsConstructor;
+import com.mays.mtgboostergame.deck.Deck;
+import com.mays.mtgboostergame.security.jwt.JwtUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +16,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-    @Autowired
     private UserService userService;
+    private JwtUtil jwtUtil;
     URI uri;
 
     @Data
@@ -53,8 +49,9 @@ public class UserController {
         }
         Optional<User> user = userService.create(newUser.username, newUser.password);
         if (user.isPresent()) {
+            var userDetails = userService.loadUserByUsername(newUser.username);
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-            DTOUser dtoUser = new DTOUser(user.get(), "token");
+            DTOUser dtoUser = new DTOUser(user.get(), jwtUtil.generateToken(userDetails));
             return ResponseEntity
                     .created(uri)
                     .body(dtoUser);
@@ -64,13 +61,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<DTOUser> getByUsername(@RequestBody UserRequestBody newUser) {
-        Optional<User> optUser = userService.getUserByUsername(newUser.username);
+    public  ResponseEntity<DTOUser> getByUsername(@RequestBody UserRequestBody authUser) {
+        Optional<User> optUser = userService.getUserByUsername(authUser.username);
         if (optUser.isPresent()) {
             User user = optUser.get();
-            if (user.getPassword().equals(newUser.password)) {
-                //TODO: figure out how to generate tokens!!
-                return ResponseEntity.ok(new DTOUser(user, "token"));
+            if (user.getPassword().equals(authUser.password)) {
+                var details = userService.loadUserByUsername(authUser.username);
+                return ResponseEntity.ok(new DTOUser(user, jwtUtil.generateToken(details)));
             } else {
                 return ResponseEntity.badRequest().build();
             }

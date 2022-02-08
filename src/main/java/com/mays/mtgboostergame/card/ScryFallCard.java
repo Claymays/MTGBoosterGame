@@ -1,7 +1,6 @@
-package com.mays.mtgboostergame.Data;
+package com.mays.mtgboostergame.card;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

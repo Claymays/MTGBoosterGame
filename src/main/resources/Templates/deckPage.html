@@ -5,13 +5,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" media="all" href="style.css">
+    <link rel="stylesheet" type="text/css" media="all" href="/css/style.css">
     <title id="title"></title>
 </head>
 
 <body>
     <h1>
-        <button onclick="deleteDeck()" type="submit">Delete Deck (Don't click if there are cards in the deck!!)</button>
+        <button onclick="deleteDeck()" type="submit">Delete Deck</button>
         <input id="searchBar" type="text" name="searchBar">
         <button onclick="cardSearch()">Search</button>
     </h1>
@@ -20,15 +20,15 @@
     </h2>
 
     <div id="deckContainer">
-        <div id="lands"></div>
-        <div id="creatures"></div>
-        <div id="instants"></div>
-        <div id="sorceries"></div>
-        <div id="artifacts"></div>
-        <div id="planeswalkers"></div>
-        <div id="enchantments"></div>
+        <div id="lands" class="typeContainer">Lands:</div>
+        <div id="creatures" class="typeContainer">Creatures:</div>
+        <div id="instants" class="typeContainer">Instants:</div>
+        <div id="sorceries" class="typeContainer">Sorceries:</div>
+        <div id="artifacts" class="typeContainer">Artifacts:</div>
+        <div id="planeswalkers" class="typeContainer">Planeswalkers:</div>
+        <div id="enchantments" class="typeContainer">Enchantments:</div>
     </div>
-    <script src="script.js"></script>
+    <script src="/js/script.js"></script>
     <script>
         window.onload = function() {
             loadDeck();

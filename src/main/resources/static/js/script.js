@@ -49,13 +49,19 @@ async function userAuth() {
     setUser(response);
 }
 
-function setUser(user) {
+async function setUser(user) {
     var decks = user.decks;
-    localStorage.setItem(user.token, JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify(user));
     decks.forEach(deck => {
         localStorage.setItem(deck.id, JSON.stringify(deck));
     });
-    location.href = baseUrl + '/userPage';
+
+    location.href = await fetch(baseUrl + '/userPage', {
+        method: 'GET',
+        headers: {
+            "Authorization": 'bearer' + user.token
+        },
+    })
 }
 
 function loadUser() {

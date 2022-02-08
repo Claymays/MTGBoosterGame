@@ -1,4 +1,4 @@
-package com.mays.mtgboostergame.Data;
+package com.mays.mtgboostergame.deck;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

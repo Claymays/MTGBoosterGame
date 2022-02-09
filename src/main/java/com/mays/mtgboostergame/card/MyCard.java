@@ -20,6 +20,7 @@ public class MyCard {
     @Column(name = "card_id", unique = true)
     @Type(type = "uuid-char")
     private UUID id;
+    @Column(name = "card_name")
     private String name;
     @Column(name = "mana_cost")
     private String manaCost;
@@ -32,13 +33,7 @@ public class MyCard {
     private String oracleText;
     private String pngUri;
 
-    @ManyToMany(mappedBy = "cardsInDeck",
-                cascade = {
-                CascadeType.DETACH,
-                CascadeType.MERGE,
-                CascadeType.REFRESH,
-                CascadeType.PERSIST
-    })
+    @ManyToMany(mappedBy = "cardsInDeck")
     @JsonIgnore
     private List<Deck> decks;
 

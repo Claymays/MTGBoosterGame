@@ -20,7 +20,7 @@ public class UserService implements UserDetailsService {
     @Autowired private UserRepository userRepository;
 
     public Optional<User> create(String username, String password) {
-        return Optional.of(userRepository.save(new User(username, password)));
+        return Optional.of(userRepository.save(new User(username, password, "user")));
     }
 
     public Optional<User> get(Integer id) {

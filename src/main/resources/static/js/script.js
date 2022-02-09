@@ -51,21 +51,25 @@ async function userAuth() {
 
 async function setUser(user) {
     var decks = user.decks;
-    localStorage.setItem('user', JSON.stringify(user));
     decks.forEach(deck => {
         localStorage.setItem(deck.id, JSON.stringify(deck));
     });
 
-    location.href = await fetch(baseUrl + '/userPage', {
-        method: 'GET',
-        headers: {
-            "Authorization": 'bearer' + user.token
-        },
-    })
+    localStorage.setItem('token', user.token);
+    delete user.token;
+    localStorage.setItem('user', JSON.stringify(user));
+
+    location.href = '/userPage';
+//    var user = await fetch(baseUrl + '/api/user', {
+//        method: '',
+//        headers: {
+//            "Authorization": 'bearer' + user.token
+//        },
+//    })
 }
 
 function loadUser() {
-    const user = JSON.parse(localStorage.getItem('token'));
+    const user = JSON.parse(localStorage.getItem('user'));
     const title = document.getElementById('userTitle');
     var container = document.getElementById('deckContainer');
     const decks = user.decks || [];
@@ -86,7 +90,7 @@ function loadUser() {
 
 async function createDeck() {
     const newDeckName = prompt('New deck\'s name:') || 'default';
-    var user = JSON.parse(localStorage.getItem('token'));
+    var user = JSON.parse(localStorage.getItem('user'));
     var decks = user.decks;
     const newDeckParams = {
         userId: user.id,
@@ -96,6 +100,7 @@ async function createDeck() {
     const searchInit = {
            method: 'POST',
            headers: {
+               'Authorization': 'bearer' + localStorage.getItem('token'),
                'Content-Type': 'application/json',
            },
            body: JSON.stringify(newDeckParams),
@@ -105,12 +110,12 @@ async function createDeck() {
     .then(response => {return response.json()});
 
     user.decks.push(newDeck);
-    localStorage.setItem('token', JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
 }
 
 function loadDeck() {
-    const user = JSON.parse(localStorage.getItem('token'));
+    const user = JSON.parse(localStorage.getItem('user'));
     var enchantments = document.getElementById('enchantments');
     var sorceries = document.getElementById('sorceries');
     var planeswalkers = document.getElementById('planeswalkers');
@@ -149,15 +154,18 @@ async function deleteDeck() {
     var deckId = localStorage.getItem('activeDeck');
     var url = baseUrl + '/api/deck/' + deckId;
     await fetch(url, {
+        headers: {
+            'Authorization': 'bearer' + localStorage.getItem('token'),
+        },
         method: 'DELETE',
         });
-    var user = JSON.parse(localStorage.getItem('token'));
+    var user = JSON.parse(localStorage.getItem('user'));
     for (let i = 0; i < user.decks.length; i = i + 1) {
         if (user.decks[i].id == deckId) {
             user.decks.splice(i, 1);
         }
     }
-    localStorage.setItem(user.token, JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify(user));
     location.href = '/userPage';
 }
 
@@ -197,11 +205,11 @@ async function addCardToDeck(card, deckID) {
         cardName: card.name,
         deckId: deckID
     };
-    var user = JSON.parse(localStorage.getItem('token'));
+    var user = JSON.parse(localStorage.getItem('user'));
     for (var i = 0; i < user.decks.length; i++) {
         if (user.decks[i].id == deckID) {
             user.decks[i].cardsInDeck.push(card);
-            localStorage.setItem('token', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user));
         }
     }
     var test = await fetch('http://localhost:8080/api/card/?cardName=' + card.name + '&deckId=' + deckID,

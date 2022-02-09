@@ -29,7 +29,7 @@ import java.time.ZoneId;
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserService jwtUserDetailsService;
+    private final UserService userService;
     private final JwtRequestFilter jwtRequestFilter;
     private final ObjectMapper mapper;
 
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(jwtUserDetailsService)
+                .userDetailsService(userService)
                 .passwordEncoder(passwordEncoder());
     }
 
@@ -69,13 +69,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .headers()
                 .frameOptions().disable()
-
             .and()
             .authorizeRequests()
-                .antMatchers("/api/user/login", "/login", "/api/user")
+                .antMatchers("/api/user/login", "/api/user", "/api/card/**")
                 .anonymous()
                 .antMatchers("/api/**").authenticated()
-                .anyRequest().authenticated()
+                .anyRequest().anonymous()
             .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

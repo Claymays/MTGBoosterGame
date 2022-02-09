@@ -4,6 +4,8 @@ import com.mays.mtgboostergame.deck.Deck;
 import com.mays.mtgboostergame.security.jwt.JwtUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,7 +18,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+    @Autowired
     private UserService userService;
+    @Autowired
     private JwtUtil jwtUtil;
     URI uri;
 

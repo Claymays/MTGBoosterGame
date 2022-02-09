@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="USER")
@@ -38,14 +39,22 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Deck> decks;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,
+               cascade = {
+                   CascadeType.DETACH,
+                   CascadeType.PERSIST,
+                   CascadeType.MERGE,
+                   CascadeType.REFRESH
+               })
     private Collection<Role> roles;
 
-    public User(String username, String password) {
+    public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.created = Instant.now();
         this.lastModified = Instant.now();
         this.decks = new ArrayList<>();
+        this.roles = new ArrayList<>();
+        this.roles.add(new Role(role));
     }
 }

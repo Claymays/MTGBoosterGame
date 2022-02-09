@@ -12,12 +12,7 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "role",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uniq_name", columnNames = "name")
-        }
-)
+@Table(name = "role")
 public class Role {
     @Id
     @GeneratedValue

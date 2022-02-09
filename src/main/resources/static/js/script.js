@@ -13,7 +13,7 @@ async function createUser() {
 
     var userSearchUrl = baseUrl + '/api/user';
 
-    const user = await fetch(userSearchUrl, {
+    const user = await fetch(paths.users, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -24,10 +24,10 @@ async function createUser() {
         console.log(error);
     });
     if (user != null) {
-        setUser(user);
+        await setUser(user);
     }
 
-
+    location.href = 'userPage';
 }
 
 async function userAuth() {
@@ -38,7 +38,7 @@ async function userAuth() {
 
     var searchUrl = baseUrl + '/api/user/login';
 
-    var response = await fetch(searchUrl, {
+    let response = await fetch(paths.login, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ function loadUser() {
     title.innerText = user.username;
 
     decks.forEach(deck => {
-        var block = document.createElement("button");
+        let block = document.createElement("button");
         block.setAttribute('id', deck.id);
         block.innerText = deck.deckName;
         container.appendChild(block);
@@ -86,6 +86,11 @@ function loadUser() {
             location.href='/deck';
         });
     });
+}
+
+function logout() {
+    localStorage.clear();
+    location.href = 'login';
 }
 
 async function createDeck() {
@@ -138,11 +143,11 @@ function loadDeck() {
 
 
     title.innerText = deck.deckName;
-    var deckTitle = document.createElement('span');
+    let deckTitle = document.createElement('span');
     deckTitle.innerText = deck.deckName;
     header.appendChild(deckTitle);
 
-    var cards = deck.cardsInDeck || [];
+    let cards = deck.cardsInDeck || [];
 
     cards.forEach(card => {
         loadCard(card);
@@ -191,7 +196,7 @@ async function cardSearch() {
     var img = document.createElement('img');
     img.setAttribute('id', 'card');
     img.src = card.pngUri;
-    var addButton = document.createElement('button');
+    let addButton = document.createElement('button');
     addButton.setAttribute('id', 'addButton');
     addButton.innerText = '+';
     addButton.addEventListener('click', function() {addCardToDeck(card, JSON.parse(localStorage.getItem('activeDeck')))});

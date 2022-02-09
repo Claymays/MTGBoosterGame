@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title id="userTitle"></title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <script defer src="/js/script.js"></script>
 </head>
 <body>
     <div id="deckContainer"></div>
@@ -12,6 +11,9 @@
     <div id="newDeckButton">
         <button onclick="createDeck()" type="button">New Deck</button>
     </div>
+
+    <script defer src="/js/script.js"></script>
+    <script src="/js/shared.js" type="module"></script>
     <script>
         window.onload = function() {
             loadUser();

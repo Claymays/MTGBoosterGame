@@ -3,7 +3,10 @@ img, a {
     height: 17%
 }
 
+#cardSearchContainer, #deckContainer .typeContainer {
+    display: none;
+}
+
 .typeContainer {
     display: flex;
-    display: none;
 }

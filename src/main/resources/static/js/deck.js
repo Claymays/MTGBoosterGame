@@ -1,14 +1,24 @@
 import * as constants from './shared.js';
-import { $, get, set} from "./shared.js"
+import {$, get, set, setUser} from "./shared.js"
 
 window.onload = () => { loadDeck(); }
+
+let user;
 
 async function loadDeck() {
     let title = $('#title');
     let header = $('#header');
 
+//  Attach a search bar to the header.
     await loadSearchBar();
 
+//  Attach a delete button to the header.
+    let deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete deck';
+    deleteButton.addEventListener('click', deleteDeck);
+    header.append(deleteButton);
+
+//  Attach hidden card types containers to the body.
     cardTypeDiv('enchantments');
     cardTypeDiv('sorceries');
     cardTypeDiv('creatures');
@@ -17,21 +27,24 @@ async function loadDeck() {
     cardTypeDiv('lands');
     cardTypeDiv('artifacts');
 
-    let deckId = get('activeDeck');
-    let deck;
-    for (let i = 0; i < constants.user.decks.length; i++) {
-        if (constants.user.decks[i].id === deckId) {
-            deck = constants.user.decks[i];
+//  Pull the chosen deck from storage
+    user = JSON.parse(get('user'));
+    let deckId = JSON.parse(get('activeDeck'));
+    let activeDeck;
+    for (let i = 0; i < user.decks.length; i++) {
+        if (user.decks[i].id === deckId) {
+            activeDeck = user.decks[i];
         }
     }
 
-    title.innerText = deck.deckName;
+    title.innerText = activeDeck.deckName;
+
     let deckTitle = document.createElement('span');
-    deckTitle.innerText = deck.deckName;
+    deckTitle.innerText = activeDeck.deckName;
     header.appendChild(deckTitle);
 
-    let cards = deck.cardsInDeck || [];
-
+//  Parse each card and assign it to a cardTypeDiv.
+    let cards = activeDeck.cardsInDeck || [];
     cards.forEach(card => {
         loadCard(card);
     });
@@ -41,15 +54,15 @@ async function loadDeck() {
 async function cardSearch() {
     if (get('card') != null) {
         localStorage.removeItem('card')
-        let oldCard = $('card')
-        let btn = $('addButton');
+        let oldCard = $('#card')
+        let btn = $('#addButton');
         if (btn != null) {btn.remove();}
         if (oldCard != null) {
             oldCard.remove();
         }
     }
 
-    let cardSearchParams = '?name=' + $('searchBar').value;
+    let cardSearchParams = '?name=' + $('#searchBar').value;
     let searchUrl = constants.paths.cards + cardSearchParams;
 
     const card = await fetch(searchUrl)
@@ -59,7 +72,7 @@ async function cardSearch() {
 
     set('card', JSON.stringify(card));
 
-    let header = $('deckHeader');
+    let header = $('#header');
 
     let img = document.createElement('img');
     img.id = 'card';
@@ -82,7 +95,6 @@ function loadCard(card) {
     a.setAttribute('href',"/card");
     let cardElement = document.createElement('img');
     cardElement.src = card.pngUri;
-    let container = document.getElementById('deckContainer');
 
     a.appendChild(cardElement);
 
@@ -90,43 +102,36 @@ function loadCard(card) {
         let creatures = $('#creatures')
         creatures.style.display = 'inline';
         creatures.appendChild(a);
-        container.appendChild(creatures);
     }
     else if (card.typeLine.includes('Planeswalker')) {
         let planeswalkers = $('#planeswalkers');
         planeswalkers.style.display = 'inline';
         planeswalkers.appendChild(a);
-        container.appendChild(planeswalkers);
     }
     else if (card.typeLine.includes('Enchantment')) {
         let enchantments = $('#enchantments');
         enchantments.style.display = 'inline';
         enchantments.appendChild(a);
-        container.appendChild(enchantments)
     }
     else if (card.typeLine.includes('Sorcery')) {
         let sorceries = $('#sorceries');
         sorceries.style.display = 'inline';
         sorceries.appendChild(a);
-        container.appendChild(sorceries);
     }
     else if (card.typeLine.includes('Instant')) {
         let instants = $('#instants');
         instants.style.display = 'inline';
         instants.appendChild(a);
-        container.appendChild(instants);
     }
     else if (card.typeLine.includes('Land')) {
         let lands = $('#lands');
         lands.style.display = 'inline';
         lands.appendChild(a);
-        container.appendChild(lands);
     }
     else if (card.typeLine.includes('Artifact')) {
         let artifacts = $('#artifacts');
         artifacts.style.display = 'inline';
         artifacts.appendChild(a);
-        container.appendChild(artifacts);
     }
 }
 
@@ -156,7 +161,7 @@ async function addCardToDeck(card, deckID) {
 }
 
 function cardTypeDiv(name) {
-    let container = $('#cardContainer');
+    let container = $('#content');
 
     let div = document.createElement('div');
     div.id = name;
@@ -166,21 +171,24 @@ function cardTypeDiv(name) {
 }
 
 async function deleteDeck() {
-    let deckId = localStorage.getItem('activeDeck');
-    let url = baseUrl + '/api/deck/' + deckId;
+    let deckId = get('activeDeck');
+
+    let url = constants.paths.decks + '/' + deckId;
     await fetch(url, {
         headers: {
-            'Authorization': 'bearer' + localStorage.getItem('token'),
+            'Authorization': 'bearer' + get('token'),
         },
         method: 'DELETE',
     });
-    let user = JSON.parse(localStorage.getItem('user'));
-    for (let i = 0; i < user.decks.length; i = i + 1) {
+
+    let user = JSON.parse(get('user'));
+    for (let i = 0; i < user.decks.length; i++) {
         if (user.decks[i].id == deckId) {
             user.decks.splice(i, 1);
         }
     }
-    localStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+
     location.href = '/userPage';
 }
 
@@ -194,9 +202,14 @@ async function loadSearchBar() {
 
     let submitButton = document.createElement('button');
     submitButton.textContent = 'submit';
-    submitButton.addEventListener('click',  async function() {
-        let card = await fetch(constants.paths.cards).then(response => {return response.json();});
-        await cardSearch(card, get('activeDeck'));
-    });
+    submitButton.addEventListener('click',  function() {
+        fetch(constants.paths.cards)
+            .then(response => {
+                return response.json();
+            })
+        .then(card => {
+            cardSearch(card, get('activeDeck'));
+        })
+    })
     header.append(submitButton);
 }

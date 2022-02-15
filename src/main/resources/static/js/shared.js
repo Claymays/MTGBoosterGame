@@ -26,6 +26,5 @@ export function logout() {
     location.href = 'login';
 }
 
-export let user;
 export let decks;
 

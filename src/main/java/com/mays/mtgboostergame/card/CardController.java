@@ -58,7 +58,7 @@ public class CardController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<DTOCard> addToDeck(
               @RequestParam String cardName
             , @RequestParam Integer deckId
@@ -86,7 +86,7 @@ public class CardController {
         return ResponseEntity.ok(card);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<DTOCard> getByName(@RequestParam String name) {
         Optional<MyCard> optionalCard = cardService.getCardByName(name);
         if (optionalCard.isPresent()) {

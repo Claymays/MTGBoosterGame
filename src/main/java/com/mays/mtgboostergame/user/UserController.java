@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,10 +22,13 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     URI uri;
 
     @Data
     @NoArgsConstructor
+//    A data transfer object for users.
     public static class DTOUser {
         private String token;
         private Integer id;
@@ -50,7 +54,10 @@ public class UserController {
         if (userService.userExistsByUsername(newUser.username)) {
             return ResponseEntity.badRequest().build();
         }
-        Optional<User> user = userService.create(newUser.username, newUser.password);
+
+        var encryptedPassword = passwordEncoder.encode(newUser.password);
+        Optional<User> user = userService.create(newUser.username, encryptedPassword);
+
         if (user.isPresent()) {
             var userDetails = userService.loadUserByUsername(newUser.username);
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
@@ -68,7 +75,7 @@ public class UserController {
         Optional<User> optUser = userService.getUserByUsername(authUser.username);
         if (optUser.isPresent()) {
             User user = optUser.get();
-            if (user.getPassword().equals(authUser.password)) {
+            if (passwordEncoder.matches(authUser.password, user.getPassword())) {
                 var details = userService.loadUserByUsername(authUser.username);
                 return ResponseEntity.ok(new DTOUser(user, jwtUtil.generateToken(details)));
             } else {

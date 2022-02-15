@@ -57,7 +57,7 @@ public class DeckController {
     @PostMapping
     public ResponseEntity<DTODeck> createDeck(@RequestBody DeckRequestBody newDeck) {
         Optional<Deck> deck = deckService.create(newDeck);
-        if (deck != null) {
+        if (deck.isPresent()) {
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
             return ResponseEntity.created(uri).body(new DTODeck(deck.get()));
         } else {
@@ -69,11 +69,7 @@ public class DeckController {
     public ResponseEntity<DTODeck> getDeck(@PathVariable Integer id) {
         Optional<Deck> deck = deckService.get(id);
 
-        if (deck != null) {
-            return ResponseEntity.ok(new DTODeck(deck.get()));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return deck.map(value -> ResponseEntity.ok(new DTODeck(value))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,5 @@
-import * as constants from './shared';
-import { $, get, set, setUser} from "./shared";
+import * as constants from './shared.js';
+import { $, get, set, setUser} from "./shared.js";
 
 let content = $('#content');
 
@@ -8,11 +8,14 @@ window.onload = () => {
     displayDecks();
 }
 
-function displayUser() {
-    constants.user = JSON.parse(get('user'));
+let user;
+let decks;
 
-    const title = $('userTitle');
-    title.innerText = constants.user.username;
+function displayUser() {
+    user = JSON.parse(get('user'));
+
+    const title = $('#userTitle');
+    title.innerText = user.username;
 
     let newDeckButton = document.createElement('button');
     newDeckButton.textContent = 'Create Deck';
@@ -25,9 +28,9 @@ function displayUser() {
 }
 
 function displayDecks() {
-    constants.decks = constants.user.decks || [];
+    decks = user.decks || [];
 
-    constants.decks.forEach(deck => {
+    decks.forEach(deck => {
         loadDeck(deck);
     });
 }
@@ -35,7 +38,7 @@ function displayDecks() {
 async function createDeck() {
     const newDeckName = prompt('New deck\'s name:') || 'default';
     const newDeckParams = {
-        userId: constants.user.id,
+        userId: user.id,
         deckName: newDeckName
     };
     const searchInit = {
@@ -53,8 +56,8 @@ async function createDeck() {
         });
 
     if (newDeck != null ) {
-        constants.user.decks.push(newDeck);
-        setUser(constants.user);
+        user.decks.push(newDeck);
+        setUser(user);
         loadDeck(newDeck);
     }
 
@@ -63,14 +66,14 @@ async function createDeck() {
 function loadDeck(deck) {
     let deckContainer = $('#deckContainer');
 
-    let deckBlock = document.createElement("button");
-    deckBlock.setAttribute('id', deck.id);
-    deckBlock.innerText = deck.deckName;
+    let deckButton = document.createElement("button");
+    deckButton.setAttribute('id', deck.id);
+    deckButton.textContent = deck.deckName;
 
-    deckBlock.addEventListener('click', function() {
+    deckButton.addEventListener('click', function() {
         set('activeDeck', deck.id);
         location.href='/deck';
     });
 
-    deckContainer.append(deckBlock);
+    deckContainer.append(deckButton);
 }

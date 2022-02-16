@@ -1,4 +1,3 @@
-export const origin = 'http://localhost:8080';
 export const api_base_path = '/api';
 export const paths = {
     login_page: '/login',
@@ -15,7 +14,6 @@ export const set = (key, value) => localStorage.setItem(key, value);
 export const get = (key) => localStorage.getItem(key);
 
 export const $ = (selector) => document.querySelector(selector);
-export const $all = (selector) => document.querySelectorAll(selector);
 
 export function setUser(user) {
     set('token', user.token);
@@ -23,8 +21,24 @@ export function setUser(user) {
 }
 export function logout() {
     localStorage.clear();
-    location.href = 'login';
+    location.href = '/login';
 }
 
-export let decks;
+export async function checkAuth() {
+    let searchUrl = paths.users;
+    await fetch(searchUrl, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'bearer' + get('token'),
+            'Content-Type': 'application/json',
+        }
+    })
+        .then(response => {return response.json()})
+        .then(json => {
+            console.debug('Authorization response:', json);
+            if (json.error) {
+                logout();
+            }
+        });
+}
 

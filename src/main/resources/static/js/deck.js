@@ -1,16 +1,20 @@
 import * as constants from './shared.js';
-import {$, get, set, setUser} from "./shared.js"
+import {$, checkAuth, get, set, setUser} from "./shared.js"
 
-window.onload = () => { loadDeck(); }
+window.onload = () => {
+    checkAuth();
+    loadDeck();
+}
 
 let user;
+let container = $('#content');
 
 async function loadDeck() {
     let title = $('#title');
     let header = $('#header');
 
 //  Attach a search bar to the header.
-    await loadSearchBar();
+    loadSearchBar();
 
 //  Attach a delete button to the header.
     let deleteButton = document.createElement('button');
@@ -51,46 +55,36 @@ async function loadDeck() {
 
 }
 
-async function cardSearch() {
-    if (get('card') != null) {
-        localStorage.removeItem('card')
-        let oldCard = $('#card')
-        let btn = $('#addButton');
-        if (btn != null) {btn.remove();}
-        if (oldCard != null) {
-            oldCard.remove();
-        }
-    }
-
-    let cardSearchParams = '?name=' + $('#searchBar').value;
-    let searchUrl = constants.paths.cards + cardSearchParams;
-
-    const card = await fetch(searchUrl)
-        .then(response => {
-            return response.json();
-        });
-
-    set('card', JSON.stringify(card));
-
+async function loadSearchBar() {
     let header = $('#header');
 
-    let img = document.createElement('img');
-    img.id = 'card';
-    img.src = card.pngUri;
+    let cardSearchBar = document.createElement('input');
+    cardSearchBar.id = 'searchBar';
+    cardSearchBar.autocomplete = 'Card Search';
+    header.append(cardSearchBar);
 
-    let addButton = document.createElement('button');
-    addButton.id = 'addButton';
-    addButton.textContent = '+';
-    addButton.addEventListener('click', function() {
-        addCardToDeck(card, JSON.parse(get('activeDeck')))
-    });
-
-    header.appendChild(img);
-    header.appendChild(addButton);
-
+    let submitButton = document.createElement('button');
+    submitButton.textContent = 'submit';
+    submitButton.addEventListener('click',  function() {
+        fetch(constants.paths.cards)
+            .then(response => {
+                return response.json();
+            })
+            .then(card => {
+                cardSearch(card, get('activeDeck'));
+            })
+    })
+    header.append(submitButton);
 }
 
 function loadCard(card) {
+    /*
+     Create a card image with a link to its own page.
+     Attach the image to the appropriate cardTypeDiv.
+    */
+    // TODO: figure out how to make a page for the cards
+    // TODO: Make custom groupings for cards.
+
     let a = document.createElement('a');
     a.setAttribute('href',"/card");
     let cardElement = document.createElement('img');
@@ -140,34 +134,75 @@ async function addCardToDeck(card, deckID) {
         cardName: card.name,
         deckId: deckID
     };
+
     let user = JSON.parse(get('user'));
     for (let i = 0; i < user.decks.length; i++) {
         if (user.decks[i].id === deckID) {
             user.decks[i].cardsInDeck.push(card);
-            localStorage.setItem('user', JSON.stringify(user));
+            setUser(user);
         }
     }
-    let test = await fetch('http://localhost:8080/api/card/?cardName=' + card.name + '&deckId=' + deckID,
-        {
+
+    let searchRequests = constants.paths.cards + '/?cardName=' + card.name + '&deckId=' + deckID;
+    fetch(searchRequests, {
             method: 'POST',
             headers: {
+                'Authorization': 'bearer' + get('token'),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(params),
-        }).then(response => {return response.json();});
+        })
+        .then(response => {return response.json();})
+        .then(card => {loadCard(card);});
+}
 
-    loadCard(test);
+function cardSearch() {
+    // Check to see if there is a previous search, and remove it.
+    if (get('card') != null) {
+        localStorage.removeItem('card')
+        let oldCard = $('#card')
+        let btn = $('#addButton');
+        if (btn != null) {btn.remove();}
+        if (oldCard != null) {
+            oldCard.remove();
+        }
+    }
 
+    let cardSearchParams = '?name=' + $('#searchBar').value;
+    let searchUrl = constants.paths.cards + cardSearchParams;
+
+    fetch(searchUrl)
+        .then(response => {
+            return response.json();
+        })
+        .then(card => {
+
+            set('card', JSON.stringify(card));
+
+            let header = $('#header');
+
+            let img = document.createElement('img');
+            img.id = 'card';
+            img.src = card.pngUri;
+
+            let addCardButton = document.createElement('button');
+            addCardButton.id = 'addButton';
+            addCardButton.textContent = '+';
+            addCardButton.addEventListener('click', function() {
+                addCardToDeck(card, JSON.parse(get('activeDeck')))
+            });
+
+            header.appendChild(img);
+            header.appendChild(addCardButton);
+        });
 }
 
 function cardTypeDiv(name) {
-    let container = $('#content');
-
-    let div = document.createElement('div');
-    div.id = name;
-    div.textContent = name;
-    div.style.display = 'none';
-    container.append(div);
+    let cardTypeDiv = document.createElement('div');
+    cardTypeDiv.id = name;
+    cardTypeDiv.textContent = name;
+    cardTypeDiv.style.display = 'none';
+    container.append(cardTypeDiv);
 }
 
 async function deleteDeck() {
@@ -190,26 +225,4 @@ async function deleteDeck() {
     setUser(user);
 
     location.href = '/userPage';
-}
-
-async function loadSearchBar() {
-    let header = $('#header');
-
-    let cardSearchBar = document.createElement('input');
-    cardSearchBar.id = 'searchBar';
-    cardSearchBar.autocomplete = 'Card Search';
-    header.append(cardSearchBar);
-
-    let submitButton = document.createElement('button');
-    submitButton.textContent = 'submit';
-    submitButton.addEventListener('click',  function() {
-        fetch(constants.paths.cards)
-            .then(response => {
-                return response.json();
-            })
-        .then(card => {
-            cardSearch(card, get('activeDeck'));
-        })
-    })
-    header.append(submitButton);
 }

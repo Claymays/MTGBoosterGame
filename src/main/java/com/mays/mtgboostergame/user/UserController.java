@@ -4,6 +4,7 @@ import com.mays.mtgboostergame.deck.Deck;
 import com.mays.mtgboostergame.security.jwt.JwtUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,6 +48,11 @@ public class UserController {
     private static class UserRequestBody {
         String username;
         String password;
+    }
+
+    @GetMapping
+    public ResponseEntity authorizationCheck() {
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping

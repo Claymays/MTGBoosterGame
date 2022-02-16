@@ -27,29 +27,28 @@ window.onload = () => {
     container.append(newUserButton);
 }
 
-async function createUser() {
+function createUser() {
     let params = {
         username: $('#username').value,
         password: $('#password').value
     };
 
-    const user = await fetch(constants.paths.users, {
+    fetch(constants.paths.users, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
-    }).then(response => {return response.json()})
+    })
+        .then(response => {return response.json()})
+        .then(user => {
+            setUser(user);
+            location.href = 'userPage';
+        })
     .catch(error => {
+        alert('Error creating account. Please try again');
         console.log(error);
     });
-    if (user != null) {
-        await setUser(user);
-    } else {
-        prompt('Error creating account. Please try again');
-    }
-
-    location.href = 'userPage';
 }
 
 async function userAuth() {
@@ -58,21 +57,23 @@ async function userAuth() {
         password: $('#password').value
     };
 
-    let response = await fetch(constants.paths.users_auth, {
+    fetch(constants.paths.users_auth, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
     })
-    .then(data => {return data.json()});
-    if (response != null) {
-        setUser(response);
-        location.href = '/userPage';
-    } else {
-        prompt('Error logging in. Please try again');
-    }
-
+        .then(data => {
+            return data.json()
+        })
+        .then(user => {
+            setUser(user);
+            location.href = '/userPage';
+        })
+        .catch(error => {
+            alert('Error logging in. Please try again');
+    })
 }
 
 

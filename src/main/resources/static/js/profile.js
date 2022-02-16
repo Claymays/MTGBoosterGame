@@ -1,11 +1,13 @@
 import * as constants from './shared.js';
-import { $, get, set, setUser} from "./shared.js";
+import {$, checkAuth, get, set, setUser} from "./shared.js";
 
 let content = $('#content');
 
 window.onload = () => {
-    displayUser();
-    displayDecks();
+    checkAuth().then(() => {
+        displayUser();
+        displayDecks();
+    })
 }
 
 let user;
@@ -17,10 +19,10 @@ function displayUser() {
     const title = $('#userTitle');
     title.innerText = user.username;
 
-    let newDeckButton = document.createElement('button');
-    newDeckButton.textContent = 'Create Deck';
-    newDeckButton.addEventListener('click', createDeck);
-    content.append(newDeckButton);
+    let createDeckButton = document.createElement('button');
+    createDeckButton.textContent = 'Create Deck';
+    createDeckButton.addEventListener('click', createDeck);
+    content.append(createDeckButton);
 
     let deckContainer = document.createElement('div');
     deckContainer.id = 'deckContainer';
@@ -35,7 +37,7 @@ function displayDecks() {
     });
 }
 
-async function createDeck() {
+function createDeck() {
     const newDeckName = prompt('New deck\'s name:') || 'default';
     const newDeckParams = {
         userId: user.id,
@@ -50,17 +52,18 @@ async function createDeck() {
         body: JSON.stringify(newDeckParams),
     };
 
-    const newDeck = await fetch(constants.paths.decks, searchInit)
+    fetch(constants.paths.decks, searchInit)
         .then(response => {
             return response.json()
-        });
-
-    if (newDeck != null ) {
-        user.decks.push(newDeck);
-        setUser(user);
-        loadDeck(newDeck);
-    }
-
+        })
+        .then(deck => {
+            user.decks.push(deck);
+            setUser(user);
+            loadDeck(deck);
+        })
+        .catch(error => {
+            alert('this happened: ' + error);
+        }) ;
 }
 
 function loadDeck(deck) {

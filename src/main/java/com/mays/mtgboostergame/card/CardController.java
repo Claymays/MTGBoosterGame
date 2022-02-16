@@ -58,13 +58,25 @@ public class CardController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<DTOCard> addToDeck(
-              @RequestParam String cardName
-            , @RequestParam Integer deckId
-            , @RequestParam(required = false, defaultValue = "1") Integer quantity) {
+    static class CardResponseBody {
+        final String cardName;
+        final Integer deckId;
+        final Integer quantity;
 
-        Optional<MyCard> optionalMyCard = cardService.addCardToDeck(deckId, cardName, quantity);
+        public CardResponseBody(String cardName, Integer deckId, Integer quantity) {
+            this.cardName = cardName;
+            this.deckId = deckId;
+            if (quantity == null) {
+                this.quantity = 1;
+            } else {
+                this.quantity = quantity;
+            }
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<DTOCard> addToDeck(@RequestBody CardResponseBody cardToAdd) {
+        Optional<MyCard> optionalMyCard = cardService.addCardToDeck(cardToAdd);
         if (optionalMyCard.isPresent()) {
             DTOCard card = new DTOCard(optionalMyCard.get());
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();

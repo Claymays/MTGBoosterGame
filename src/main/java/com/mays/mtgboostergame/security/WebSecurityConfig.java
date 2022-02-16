@@ -71,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions().disable()
             .and()
             .authorizeRequests()
-                .antMatchers("/api/user/login", "/api/user", "/api/card/**")
+                .antMatchers("/api/user/login", "/api/user")
                 .anonymous()
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().anonymous()

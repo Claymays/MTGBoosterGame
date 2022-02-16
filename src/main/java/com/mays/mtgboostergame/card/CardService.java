@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.mays.mtgboostergame.card.CardController.*;
+
 @Data
 @NoArgsConstructor
 @Service
@@ -41,22 +43,22 @@ public class CardService {
         }
     }
 
-    public Optional<MyCard> addCardToDeck(Integer deckId, String cardName, Integer quantity) {
-        Optional<Deck> deck = deckService.get(deckId);
+    public Optional<MyCard> addCardToDeck(CardResponseBody card) {
+        Optional<Deck> deck = deckService.get(card.deckId);
         if (deck.isEmpty()) {
             return Optional.empty();
         }
 
-        Optional<MyCard> cardOpt = cardRepository.findOneByNameIgnoreCase(cardName);
+        Optional<MyCard> cardOpt = cardRepository.findOneByNameIgnoreCase(card.cardName);
         if (cardOpt.isEmpty()) {
-            cardOpt = Optional.of(new MyCard(restTemplate.getForObject(scryNameSearch + cardName, ScryFallCard.class)));
+            cardOpt = Optional.of(new MyCard(restTemplate.getForObject(scryNameSearch + card.cardName, ScryFallCard.class)));
             if (cardOpt.isEmpty()) {
                 return Optional.empty();
             }
             cardRepository.save(cardOpt.get());
         }
 
-        for (int i = 0; i < quantity; i++) {
+        for (int i = 0; i < card.quantity; i++) {
             deck.get().getCardsInDeck().add(cardOpt.get());
         }
         deckService.save(deck.get());

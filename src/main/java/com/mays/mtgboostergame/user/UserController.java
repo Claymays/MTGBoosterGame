@@ -4,10 +4,10 @@ import com.mays.mtgboostergame.deck.Deck;
 import com.mays.mtgboostergame.security.jwt.JwtUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.connector.Response;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -52,9 +52,16 @@ public class UserController {
     }
 
 //   An endpoint for checking JWT validity. I couldn't think of a better way.
-    @PostMapping("test")
+    @PostMapping("/test")
     public ResponseEntity authorizationCheck() {
-        return ResponseEntity.ok().build();
+        var securityContext = SecurityContextHolder.getContext();
+        var name = securityContext.getAuthentication().getName();
+        var user = userService.getUserByUsername(name);
+        if (user.isPresent()) {
+            return ResponseEntity.ok(new DTOUser(user.get(), jwtUtil.generateToken(userService.loadUserByUsername(name))));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping

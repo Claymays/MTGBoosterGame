@@ -24,7 +24,6 @@ export function logout() {
     location.href = '/login';
 }
 
-// TODO: figure out why we are being denied access, even with a new token.
 export async function checkAuth() {
     let searchUrl = 'http://localhost:8080/api/user/test';
     await fetch(searchUrl, {

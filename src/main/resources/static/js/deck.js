@@ -2,8 +2,7 @@ import * as constants from './shared.js';
 import {$, checkAuth, get, set, setUser} from "./shared.js"
 
 window.onload = () => {
-    checkAuth();
-    loadDeck();
+    checkAuth().then(() => loadDeck());
 }
 
 let user;
@@ -66,7 +65,12 @@ async function loadSearchBar() {
     let submitButton = document.createElement('button');
     submitButton.textContent = 'submit';
     submitButton.addEventListener('click',  function() {
-        fetch(constants.paths.cards)
+        let searchParam = '?name=' + $('#searchBar').value;
+        fetch(constants.paths.cards + searchParam, {
+            headers: {
+                'Authorization': 'bearer' + get('token')
+            }
+        })
             .then(response => {
                 return response.json();
             })
@@ -129,7 +133,7 @@ function loadCard(card) {
     }
 }
 
-async function addCardToDeck(card, deckID) {
+async function addCardToDeck(card, deckID)  {
     let params = {
         cardName: card.name,
         deckId: deckID
@@ -143,8 +147,7 @@ async function addCardToDeck(card, deckID) {
         }
     }
 
-    let searchRequests = constants.paths.cards + '/?cardName=' + card.name + '&deckId=' + deckID;
-    fetch(searchRequests, {
+    fetch(constants.paths.cards, {
             method: 'POST',
             headers: {
                 'Authorization': 'bearer' + get('token'),
@@ -171,7 +174,12 @@ function cardSearch() {
     let cardSearchParams = '?name=' + $('#searchBar').value;
     let searchUrl = constants.paths.cards + cardSearchParams;
 
-    fetch(searchUrl)
+    fetch(searchUrl, {
+        headers: {
+            'Authorization': 'bearer' + get('token'),
+            'Content-Type': 'application/json'
+        }
+    })
         .then(response => {
             return response.json();
         })
@@ -189,7 +197,7 @@ function cardSearch() {
             addCardButton.id = 'addButton';
             addCardButton.textContent = '+';
             addCardButton.addEventListener('click', function() {
-                addCardToDeck(card, JSON.parse(get('activeDeck')))
+                addCardToDeck(JSON.parse(get('card')), JSON.parse(get('activeDeck')))
             });
 
             header.appendChild(img);

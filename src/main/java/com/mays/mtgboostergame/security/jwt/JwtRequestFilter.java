@@ -2,6 +2,7 @@ package com.mays.mtgboostergame.security.jwt;
 
 import com.mays.mtgboostergame.user.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +47,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     log.error("unable to get jwt token", e);
                 } catch(ExpiredJwtException e) {
                     log.warn("JWT token has expired", e);
+                } catch(JwtException e) {
+                    log.warn(e.getMessage());
                 }
             } else {
                 log.warn("JWT token does not begin with '" + bearer + "'");

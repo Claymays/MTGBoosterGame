@@ -1,13 +1,14 @@
 package com.mays.mtgboostergame.user;
 
+import com.google.gson.Gson;
 import com.mays.mtgboostergame.deck.Deck;
 import com.mays.mtgboostergame.security.jwt.JwtUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,19 +27,18 @@ public class UserController {
     private JwtUtil jwtUtil;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    private Gson gson = new Gson();
     URI uri;
 
     @Data
     @NoArgsConstructor
 //    A data transfer object for users.
     public static class DTOUser {
-        private String token;
         private Integer id;
         private String username;
         private List<Deck> decks;
 
-        public DTOUser(User user, String token) {
-            this.token = token;
+        public DTOUser(User user) {
             this.id = user.getId();
             this. username = user.getUsername();
             this.decks = user.getDecks();
@@ -51,21 +51,22 @@ public class UserController {
         String password;
     }
 
-//   An endpoint for checking JWT validity. I couldn't think of a better way.
-    @PostMapping("/test")
-    public ResponseEntity authorizationCheck() {
-        var securityContext = SecurityContextHolder.getContext();
-        var name = securityContext.getAuthentication().getName();
-        var user = userService.getUserByUsername(name);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(new DTOUser(user.get(), jwtUtil.generateToken(userService.loadUserByUsername(name))));
+    @PostMapping
+    public ResponseEntity<DTOUser> getUser() {
+        var context = SecurityContextHolder.getContext().getAuthentication().getName();
+        var optUser = userService.getUserByUsername(context);
+
+        if (optUser.isPresent()) {
+            var user = optUser.get();
+            var dtoUser = new DTOUser(user);
+            return ResponseEntity.ok(dtoUser);
         } else {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PostMapping
-    public ResponseEntity<DTOUser> createUser(@RequestBody UserRequestBody newUser) {
+    @PostMapping("/create")
+    public ResponseEntity<String> createUser(@RequestBody UserRequestBody newUser) {
         if (userService.userExistsByUsername(newUser.username)) {
             return ResponseEntity.badRequest().build();
         }
@@ -76,23 +77,22 @@ public class UserController {
         if (user.isPresent()) {
             var userDetails = userService.loadUserByUsername(newUser.username);
             uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-            DTOUser dtoUser = new DTOUser(user.get(), jwtUtil.generateToken(userDetails));
             return ResponseEntity
                     .created(uri)
-                    .body(dtoUser);
+                    .body(gson.toJson(jwtUtil.generateToken(userDetails)));
         } else {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @PostMapping("/login")
-    public  ResponseEntity<DTOUser> getByUsername(@RequestBody UserRequestBody authUser) {
+    public  ResponseEntity<String> getByUsername(@RequestBody UserRequestBody authUser) {
         Optional<User> optUser = userService.getUserByUsername(authUser.username);
         if (optUser.isPresent()) {
             User user = optUser.get();
             if (passwordEncoder.matches(authUser.password, user.getPassword())) {
                 var details = userService.loadUserByUsername(authUser.username);
-                return ResponseEntity.ok(new DTOUser(user, jwtUtil.generateToken(details)));
+                return ResponseEntity.ok(gson.toJson(jwtUtil.generateToken(details)));
             } else {
                 return ResponseEntity.badRequest().build();
             }

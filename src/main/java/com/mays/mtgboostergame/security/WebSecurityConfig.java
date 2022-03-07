@@ -58,7 +58,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
                 "/css/**",
-                "/js/**"
+                "/js/**",
+                "/login",
+                "/deck",
+                "/userPage",
+                "/api/user/login",
+                "/api/user/create"
         );
     }
 
@@ -71,9 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions().disable()
             .and()
             .authorizeRequests()
-                .antMatchers("/api/user/login", "/api/user")
-                .anonymous()
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/**").authenticated()
                 .anyRequest().anonymous()
             .and()
             .sessionManagement()

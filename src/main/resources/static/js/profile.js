@@ -1,20 +1,27 @@
 import * as constants from './shared.js';
-import {$, checkAuth, get, set, setUser} from "./shared.js";
+import {$, logout, get, set} from './shared.js';
 
 let content = $('#content');
 
-window.onload = () => {
-    checkAuth().then(() => {
-        displayUser();
-        displayDecks();
-    })
+window.onload = async () => {
+    await displayUser();
+    displayDecks();
 }
 
 let user;
 let decks;
 
-function displayUser() {
-    user = JSON.parse(get('user'));
+
+
+async function displayUser() {
+    user = await fetch(constants.paths.users, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'bearer' + get('token')
+        },
+    })
+        .then(response => {return response.json()})
+        .catch(() => {logout()})
 
     const title = $('#userTitle');
     title.innerText = user.username;
@@ -58,7 +65,6 @@ function createDeck() {
         })
         .then(deck => {
             user.decks.push(deck);
-            setUser(user);
             loadDeck(deck);
         })
         .catch(error => {

@@ -1,16 +1,17 @@
 import * as constants from './shared.js';
-import {$, checkAuth, get, set, setUser} from "./shared.js"
+import {$, logout, get, set, setUser} from './shared.js';
 
 window.onload = () => {
-    checkAuth().then(() => loadDeck());
+    loadDeck();
 }
 
 let user;
 let container = $('#content');
 
 async function loadDeck() {
-    let title = $('#title');
-    let header = $('#header');
+    let header = document.createElement('h1');
+    header.id = 'header';
+    container.append(header);
 
 //  Attach a search bar to the header.
     loadSearchBar();
@@ -20,6 +21,7 @@ async function loadDeck() {
     deleteButton.textContent = 'Delete deck';
     deleteButton.addEventListener('click', deleteDeck);
     header.append(deleteButton);
+    container.append(header);
 
 //  Attach hidden card types containers to the body.
     cardTypeDiv('enchantments');
@@ -30,8 +32,17 @@ async function loadDeck() {
     cardTypeDiv('lands');
     cardTypeDiv('artifacts');
 
-//  Pull the chosen deck from storage
-    user = JSON.parse(get('user'));
+//  Pull the chosen deck from
+    user = await fetch(constants.paths.users, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'bearer' + get('token'),
+        }
+    })
+        .then(response => {
+            return response.json();
+        })
+        .catch(() => {logout()}) ;
     let deckId = JSON.parse(get('activeDeck'));
     let activeDeck;
     for (let i = 0; i < user.decks.length; i++) {
@@ -56,6 +67,7 @@ async function loadDeck() {
 
 async function loadSearchBar() {
     let header = $('#header');
+    let container = $('#content');
 
     let cardSearchBar = document.createElement('input');
     cardSearchBar.id = 'searchBar';
@@ -79,6 +91,8 @@ async function loadSearchBar() {
             })
     })
     header.append(submitButton);
+
+    container.append(header);
 }
 
 function loadCard(card) {
@@ -139,14 +153,6 @@ async function addCardToDeck(card, deckID)  {
         deckId: deckID
     };
 
-    let user = JSON.parse(get('user'));
-    for (let i = 0; i < user.decks.length; i++) {
-        if (user.decks[i].id === deckID) {
-            user.decks[i].cardsInDeck.push(card);
-            setUser(user);
-        }
-    }
-
     fetch(constants.paths.cards, {
             method: 'POST',
             headers: {
@@ -202,6 +208,7 @@ function cardSearch() {
 
             header.appendChild(img);
             header.appendChild(addCardButton);
+            container.append(header);
         });
 }
 
@@ -222,15 +229,8 @@ async function deleteDeck() {
             'Authorization': 'bearer' + get('token'),
         },
         method: 'DELETE',
-    });
-
-    let user = JSON.parse(get('user'));
-    for (let i = 0; i < user.decks.length; i++) {
-        if (user.decks[i].id == deckId) {
-            user.decks.splice(i, 1);
-        }
-    }
-    setUser(user);
+    })
+        .catch(() => {logout()});
 
     location.href = '/userPage';
 }

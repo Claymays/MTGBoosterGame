@@ -33,7 +33,7 @@ function createUser() {
         password: $('#password').value
     };
 
-    fetch(constants.paths.users, {
+    fetch(constants.paths.users_create, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -41,8 +41,8 @@ function createUser() {
         body: JSON.stringify(params),
     })
         .then(response => {return response.json()})
-        .then(user => {
-            setUser(user);
+        .then(token => {
+            setUser(token);
             location.href = 'userPage';
         })
     .catch(error => {
@@ -67,8 +67,8 @@ async function userAuth() {
         .then(data => {
             return data.json()
         })
-        .then(user => {
-            setUser(user);
+        .then(token => {
+            setUser(token);
             location.href = '/userPage';
         })
         .catch(error => {

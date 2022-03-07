@@ -16,7 +16,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-.src/main/resources/application.secrets.yml
+application-pc.properties
+application-ec2.properties
 
 ### IntelliJ IDEA ###
 .idea

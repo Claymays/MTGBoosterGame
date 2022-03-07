@@ -19,6 +19,7 @@ import static com.mays.mtgboostergame.card.CardController.DTOCard;
 @RestController
 @RequestMapping("/api/deck")
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class DeckController {
 
     private DeckService deckService;

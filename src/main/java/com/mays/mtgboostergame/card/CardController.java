@@ -19,6 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/card")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class CardController {
     RestTemplate restTemplate;
     CardService cardService;

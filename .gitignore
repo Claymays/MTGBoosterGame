@@ -16,8 +16,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-application-pc.properties
-application-ec2.properties
+!**/src/main/resources/application-pc.properties
+!**/src/main/resources/application-prod.properties
 
 ### IntelliJ IDEA ###
 .idea

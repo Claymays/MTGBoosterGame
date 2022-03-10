@@ -20,7 +20,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class UserController {
     @Autowired
     private UserService userService;

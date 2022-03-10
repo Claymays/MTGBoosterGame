@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +17,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor
-@RestController
-@RequestMapping("/api/card")
+@RestController()
+@RequestMapping(value = "/api/card", produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class CardController {
     RestTemplate restTemplate;
     CardService cardService;
@@ -87,7 +88,7 @@ public class CardController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<DTOCard> getById(@PathVariable UUID id) {
         Optional<MyCard> optMyCard = cardService.getCard(id);
         if (optMyCard.isEmpty()) {

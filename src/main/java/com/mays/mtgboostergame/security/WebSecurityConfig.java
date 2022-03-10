@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -19,10 +21,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -54,6 +61,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    CorsFilter corsFilter() {
+        CorsFilter filter = new CorsFilter();
+        return filter;
+    }
+
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
@@ -64,12 +77,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/userPage",
                 "/api/user/login",
                 "/api/user/create"
-        );
+        )
+                .and()
+                .ignoring()
+                .antMatchers(HttpMethod.OPTIONS);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .addFilterBefore(corsFilter(), SessionManagementFilter.class)
             .csrf()
                 .disable()
                 .headers()
@@ -101,8 +118,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 })
             .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+
         ;
     }
 
     private record Error(LocalDateTime timestamp, int status, String error, String message, String path) {}
+
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("*"));
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 }

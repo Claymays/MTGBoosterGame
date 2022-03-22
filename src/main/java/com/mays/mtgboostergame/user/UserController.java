@@ -28,7 +28,7 @@ public class UserController {
     private JwtUtil jwtUtil;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
     URI uri;
 
     @Data

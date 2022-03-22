@@ -1,5 +1,6 @@
 package com.mays.mtgboostergame.deck;
 
+import com.mays.mtgboostergame.card.MyCard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import static com.mays.mtgboostergame.card.CardController.DTOCard;
 
 @NoArgsConstructor
 @RestController
-@RequestMapping("/api/deck")
+@RequestMapping(value = "/api/deck")
 @AllArgsConstructor
 @CrossOrigin
 public class DeckController {
@@ -53,9 +54,19 @@ public class DeckController {
     public static class DeckRequestBody {
         Integer userId;
         String deckName;
+        String deckContent;
+        public DeckRequestBody(Integer userId, String deckName, String deckContent) {
+            this.deckName = deckName;
+            this.userId = userId;
+            if (!deckContent.isEmpty()) {
+                this.deckContent = deckContent;
+            } else {
+                this.deckContent = "";
+            }
+        }
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<DTODeck> createDeck(@RequestBody DeckRequestBody newDeck) {
         Optional<Deck> deck = deckService.create(newDeck);
         if (deck.isPresent()) {

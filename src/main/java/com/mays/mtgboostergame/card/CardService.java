@@ -75,6 +75,11 @@ public class CardService {
         Optional<MyCard> card = cardRepository.findOneByNameIgnoreCase(name);
         if (card.isEmpty()) {
             card = Optional.of(new MyCard(restTemplate.getForObject(scryNameSearch.concat(name), ScryFallCard.class)));
+            if (card.isPresent()) {
+                if (!cardRepository.existsByName(card.get().getName())) {
+                    cardRepository.save(card.get());
+                }
+            }
         }
         return card;
     }

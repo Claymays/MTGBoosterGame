@@ -47,9 +47,9 @@ public class Deck {
                 inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "card_id"))
     private List<MyCard> cardsInDeck;
 
-    public Deck(User user, String deckName) {
+    public Deck(User user, String deckName, List<MyCard> cardsInDeck) {
         this.user = user;
         this.deckName = deckName;
-        this.cardsInDeck = new ArrayList<>();
+        this.cardsInDeck = cardsInDeck;
     }
 }

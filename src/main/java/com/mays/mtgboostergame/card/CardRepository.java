@@ -9,5 +9,7 @@ import java.util.UUID;
 @Repository
 public interface CardRepository extends CrudRepository<MyCard, UUID> {
     public Optional<MyCard> findOneByNameIgnoreCase(String name);
+
+    public boolean existsByName(String name);
 }
 

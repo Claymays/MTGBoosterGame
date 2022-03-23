@@ -1,5 +1,6 @@
 package com.mays.mtgboostergame.deck;
 
+import com.mays.mtgboostergame.card.CardController;
 import com.mays.mtgboostergame.card.CardService;
 import com.mays.mtgboostergame.card.MyCard;
 import com.mays.mtgboostergame.user.User;
@@ -35,45 +36,36 @@ public class DeckService {
 
     public Optional<Deck> create(DeckRequestBody newDeck) {
         Optional<User> user = userService.get(newDeck.getUserId());
-        List<MyCard> list;
-        Deck deck = new Deck();
+        List<MyCard> list = new ArrayList<>();
 
         if (user.isEmpty()) {
             return Optional.empty();
         } else {
-            if (newDeck.deckContent.equals("")) {
-                list = new ArrayList<>();
-            } else {
-                Scanner scan = new Scanner(newDeck.deckContent);
-                list = new ArrayList<>();
+            Deck deck = deckRepository.save(new Deck(user.get(), newDeck.deckName, list));
+            Scanner scan = new Scanner(newDeck.deckContent);
 
-                while(scan.hasNextLine()) {
+            while(scan.hasNextLine()) {
 
-                    int quantity = 1;
-                    String name;
+                int quantity = 1;
+                String uncutCardName;
 
-                    if (scan.hasNextInt()) {
-                        quantity = scan.nextInt();
-                    }
-                    name = scan.nextLine();
-                    if (name.matches("Deck") || name.matches("Sideboard") || name.equals("")) {
-                        continue;
-                    }
-
-                    System.out.println(quantity + name);
-                    Optional<MyCard> optCard = cardService.getCardByName(name);
-                    if (optCard.isPresent()) {
-                        MyCard card = optCard.get();
-                        for (int i = 0; i < quantity; i++) {
-                            list.add(card);
-                        }
-                    }
+                if (scan.hasNextInt()) {
+                    quantity = scan.nextInt();
                 }
-                deck.setCardsInDeck(list);
-                deck.setDeckName(newDeck.deckName);
-                deck.setUser(user.get());
+                uncutCardName = scan.nextLine();
+                String cardName = uncutCardName.trim();
+                if (cardName.matches("Deck") || cardName.matches("Sideboard") || cardName.equals("")) {
+                    continue;
+                }
+
+                System.out.println(quantity + cardName);
+
+                cardService.addCardToDeck(new CardController.CardRequestBody(cardName, deck.getId(), quantity));
             }
-            return Optional.of(deckRepository.save(deck));
+
+            deckRepository.save(deck);
+
+            return Optional.of(deck);
         }
     }
 

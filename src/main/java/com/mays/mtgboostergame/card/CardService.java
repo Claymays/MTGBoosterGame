@@ -43,7 +43,7 @@ public class CardService {
         }
     }
 
-    public Optional<MyCard> addCardToDeck(CardResponseBody card) {
+    public Optional<MyCard> addCardToDeck(CardRequestBody card) {
         Optional<Deck> deck = deckService.get(card.deckId);
         if (deck.isEmpty()) {
             return Optional.empty();
@@ -61,9 +61,11 @@ public class CardService {
         for (int i = 0; i < card.quantity; i++) {
             deck.get().getCardsInDeck().add(cardOpt.get());
         }
-        deckService.save(deck.get());
 
-        return cardOpt;
+        deckService.save(deck.get());
+        Optional<MyCard> savedCard = Optional.of(cardRepository.save(cardOpt.get()));
+
+        return savedCard;
 
     }
 
@@ -73,13 +75,19 @@ public class CardService {
 
     public Optional<MyCard> getCardByName(String name) {
         Optional<MyCard> card = cardRepository.findOneByNameIgnoreCase(name);
+
         if (card.isEmpty()) {
-            card = Optional.of(new MyCard(restTemplate.getForObject(scryNameSearch.concat(name), ScryFallCard.class)));
-            if (card.isPresent()) {
-                if (!cardRepository.existsByName(card.get().getName())) {
-                    cardRepository.save(card.get());
-                }
+            ScryFallCard checkedCard = restTemplate.getForObject(scryNameSearch.concat(name), ScryFallCard.class);
+            if (checkedCard == null) {
+                return Optional.empty();
             }
+
+            card = Optional.of(new MyCard(checkedCard));
+
+            if (!cardRepository.existsByName(card.get().getName())) {
+                 card = Optional.of(cardRepository.save(card.get()));
+            }
+
         }
         return card;
     }

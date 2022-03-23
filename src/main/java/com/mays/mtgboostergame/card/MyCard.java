@@ -32,6 +32,7 @@ public class MyCard {
     @Column(name = "oracle_text", length = 1000)
     private String oracleText;
     private String pngUri;
+    private String altPng;
 
     @ManyToMany(mappedBy = "cardsInDeck")
     @JsonIgnore
@@ -47,9 +48,19 @@ public class MyCard {
         this.typeLine = card.getTypeLine();
         this.oracleText = card.getOracleText();
         this.pngUri = card.getPng();
+        if (card.getAlternateFacePng() == null) {
+            this.altPng = "";
+        } else {
+            this.altPng = card.getAlternateFacePng();
+        }
     }
 
     public void setDeck(Deck deck) {
         this.decks.add(deck);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

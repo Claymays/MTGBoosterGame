@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="DECKS")
@@ -51,5 +51,11 @@ public class Deck {
         this.user = user;
         this.deckName = deckName;
         this.cardsInDeck = cardsInDeck;
+    }
+
+    @Override
+    public String toString() {
+        return "Deck: " + deckName + "Deck_id: " + id +
+                "User: " + user.getUsername() + "Cards: " + cardsInDeck.stream().map(MyCard::getName).collect(Collectors.joining(",", "[", "]"));
     }
 }

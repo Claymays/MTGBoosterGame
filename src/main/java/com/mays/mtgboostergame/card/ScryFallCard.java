@@ -1,6 +1,8 @@
 package com.mays.mtgboostergame.card;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.jayway.jsonpath.JsonPath;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,10 +24,17 @@ public class ScryFallCard {
     @JsonProperty("oracle_text")
     private String oracleText;
     private String png;
+    private String alternateFacePng;
 
     @JsonProperty("image_uris")
-    public void unpackImg(Map<String, Object> images) {
-        this.png = (String) images.get("png");
+    public void unpackImg(Map<String, String> images) {
+        this.png = images.get("png");
+    }
+
+    @JsonProperty("card_faces")
+    public void unpackDualFace(Object faces) {
+        this.png = JsonPath.read(faces, "$[0].image_uris.png");
+        this.alternateFacePng = JsonPath.read(faces, "$[1].image_uris.png");
     }
 
 

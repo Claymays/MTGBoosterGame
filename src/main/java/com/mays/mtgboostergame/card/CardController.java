@@ -60,12 +60,12 @@ public class CardController {
         }
     }
 
-    static class CardResponseBody {
+    public static class CardRequestBody {
         final String cardName;
         final Integer deckId;
         final Integer quantity;
 
-        public CardResponseBody(String cardName, Integer deckId, Integer quantity) {
+        public CardRequestBody(String cardName, Integer deckId, Integer quantity) {
             this.cardName = cardName;
             this.deckId = deckId;
             if (quantity == null) {
@@ -77,7 +77,7 @@ public class CardController {
     }
 
     @PostMapping
-    public ResponseEntity<DTOCard> addToDeck(@RequestBody CardResponseBody cardToAdd) {
+    public ResponseEntity<DTOCard> addToDeck(@RequestBody CardRequestBody cardToAdd) {
         Optional<MyCard> optionalMyCard = cardService.addCardToDeck(cardToAdd);
         if (optionalMyCard.isPresent()) {
             DTOCard card = new DTOCard(optionalMyCard.get());

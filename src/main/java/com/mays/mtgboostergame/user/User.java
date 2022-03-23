@@ -57,4 +57,9 @@ public class User {
         this.roles = new ArrayList<>();
         this.roles.add(new Role(role));
     }
+
+    @Override
+    public String toString() {
+        return username;
+    }
 }

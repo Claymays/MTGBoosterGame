@@ -58,10 +58,10 @@ public class DeckController {
         public DeckRequestBody(Integer userId, String deckName, String deckContent) {
             this.deckName = deckName;
             this.userId = userId;
-            if (!deckContent.isEmpty()) {
-                this.deckContent = deckContent;
-            } else {
+            if (deckContent == null) {
                 this.deckContent = "";
+            } else {
+                this.deckContent = deckContent;
             }
         }
     }

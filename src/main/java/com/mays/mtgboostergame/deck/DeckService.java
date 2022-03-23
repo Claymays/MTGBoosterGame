@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public class DeckService {
 
 
     public Optional<Deck> create(DeckRequestBody newDeck) {
-        Optional<User> user = userService.get(newDeck.getUserId());
+        Optional<User> user = userService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         List<MyCard> list = new ArrayList<>();
 
         if (user.isEmpty()) {

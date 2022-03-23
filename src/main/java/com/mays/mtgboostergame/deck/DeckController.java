@@ -52,12 +52,10 @@ public class DeckController {
 
     @Data
     public static class DeckRequestBody {
-        Integer userId;
         String deckName;
         String deckContent;
-        public DeckRequestBody(Integer userId, String deckName, String deckContent) {
+        public DeckRequestBody(String deckName, String deckContent) {
             this.deckName = deckName;
-            this.userId = userId;
             if (deckContent == null) {
                 this.deckContent = "";
             } else {

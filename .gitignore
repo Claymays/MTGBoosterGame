@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 !**/src/main/resources/application-pc.properties
 !**/src/main/resources/application-prod.properties
+!**/src/main/resources/application-laptop.properties
 
 ### IntelliJ IDEA ###
 .idea

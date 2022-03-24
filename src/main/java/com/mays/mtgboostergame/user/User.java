@@ -3,20 +3,21 @@ package com.mays.mtgboostergame.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mays.mtgboostergame.deck.Deck;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name="USER")
-@Data
+@Getter
+@Setter
 @RequiredArgsConstructor
 @EntityListeners(AuditListener.class)
 public class User {
@@ -39,13 +40,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Deck> decks;
 
-    @OneToMany(fetch = FetchType.EAGER,
-               cascade = {
-                   CascadeType.DETACH,
-                   CascadeType.PERSIST,
-                   CascadeType.MERGE,
-                   CascadeType.REFRESH
-               })
+    @OneToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles;
 
     public User(String username, String password, String role) {
@@ -61,5 +56,18 @@ public class User {
     @Override
     public String toString() {
         return username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

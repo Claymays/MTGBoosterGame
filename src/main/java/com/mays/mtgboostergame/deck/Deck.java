@@ -21,12 +21,7 @@ public class Deck {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne(cascade = {
-        CascadeType.MERGE,
-        CascadeType.DETACH,
-        CascadeType.PERSIST,
-        CascadeType.REFRESH,
-    })
+    @ManyToOne
     @JoinTable(name = "deck_table",
     joinColumns = @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"),
     inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
@@ -35,13 +30,7 @@ public class Deck {
 
     private String deckName;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-                cascade = {
-                CascadeType.DETACH,
-                CascadeType.MERGE,
-                CascadeType.REFRESH,
-                CascadeType.PERSIST
-    })
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "cards_in_decks",
                 joinColumns =  @JoinColumn(name = "deck_id", referencedColumnName = "deck_id"),
                 inverseJoinColumns = @JoinColumn(name = "card_id", referencedColumnName = "card_id"))

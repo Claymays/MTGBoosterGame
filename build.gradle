@@ -25,10 +25,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'io.jsonwebtoken:jjwt-root:0.11.1'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.1'
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.1'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.1'
+	implementation 'io.jsonwebtoken:jjwt-root:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 	implementation 'org.apache.httpcomponents:httpclient'
 	implementation 'com.jayway.jsonpath:json-path:2.7.0'
 	compileOnly 'org.projectlombok:lombok'
@@ -39,8 +39,4 @@ dependencies {
 
 test {
 	useJUnitPlatform()
-}
-
-bootJar {
-	destinationDirectory = file(project.buildDir)
 }

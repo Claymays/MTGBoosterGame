@@ -60,7 +60,7 @@ public class DeckService {
                     continue;
                 }
 
-                System.out.println(quantity + cardName);
+                System.out.println(quantity + " " + cardName);
 
                 cardService.addCardToDeck(new CardController.CardRequestBody(cardName, deck.getId(), quantity));
             }

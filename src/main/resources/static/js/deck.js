@@ -32,7 +32,7 @@ async function loadDeck() {
     cardTypeDiv('lands');
     cardTypeDiv('artifacts');
 
-//  Pull the chosen deck from
+//  Pull the chosen deck from the server
     user = await fetch(constants.paths.users, {
         method: 'POST',
         headers: {

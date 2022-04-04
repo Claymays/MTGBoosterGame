@@ -2,6 +2,7 @@ package com.mays.mtgboostergame.user;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Objects;

@@ -40,7 +40,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Deck> decks;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Collection<Role> roles;
 
     public User(String username, String password, String role) {

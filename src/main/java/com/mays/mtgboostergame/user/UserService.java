@@ -3,6 +3,9 @@ package com.mays.mtgboostergame.user;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,10 +19,12 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
+@Slf4j
 public class UserService implements UserDetailsService {
     @Autowired private UserRepository userRepository;
 
     public Optional<User> create(String username, String password) {
+        log.debug("Creating new user with username: {}", username);
         return Optional.of(userRepository.save(new User(username, password, "user")));
     }
 

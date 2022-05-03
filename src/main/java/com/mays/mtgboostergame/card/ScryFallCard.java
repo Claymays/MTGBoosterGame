@@ -3,6 +3,7 @@ package com.mays.mtgboostergame.card;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,8 +34,12 @@ public class ScryFallCard {
 
     @JsonProperty("card_faces")
     public void unpackDualFace(Object faces) {
-        this.png = JsonPath.read(faces, "$[0].image_uris.png");
-        this.alternateFacePng = JsonPath.read(faces, "$[1].image_uris.png");
+        try {
+            this.png = JsonPath.read(faces, "$[0].image_uris.png");
+            this.alternateFacePng = JsonPath.read(faces, "$[1].image_uris.png");
+        } catch (PathNotFoundException error) {
+            System.err.println(error);
+        }
     }
 
 

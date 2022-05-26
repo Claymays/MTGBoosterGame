@@ -75,6 +75,40 @@ public class DeckService {
         return deckRepository.findById(id);
     }
 
+    public Optional<Deck> update(CardController.CardRequestBody cardRequestBody) {
+        Optional<Deck> optDeck = deckRepository.findById(cardRequestBody.deckId);
+        Deck deck;
+        if (optDeck.isPresent()) {
+            deck = optDeck.get();
+        } else {
+            return Optional.empty();
+        }
+        List<MyCard> oldList = deck.getCardsInDeck();
+        Optional<MyCard> optCard = cardService.getCardByName(cardRequestBody.cardName);
+        MyCard card;
+        int counter = 0;
+
+        if (optCard.isPresent()) {
+            card = optCard.get();
+
+            for (MyCard listedCard : oldList) {
+                if (listedCard.getName().equals(card.getName())) {
+                    counter++;
+                    System.out.print(counter + " ");
+                }
+            }
+            for (int i = counter; i > cardRequestBody.quantity; i--) {
+                oldList.remove(card);
+                System.out.print(oldList);
+            }
+            deck.setCardsInDeck(oldList);
+            Deck newDeck = deckRepository.save(deck);
+            return Optional.of(newDeck);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public Deck save(Deck deck) {
         return deckRepository.save(deck);
     }

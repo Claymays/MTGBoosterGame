@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,18 +62,14 @@ public class CardController {
     }
 
     public static class CardRequestBody {
-        final String cardName;
-        final Integer deckId;
-        final Integer quantity;
+        public final String cardName;
+        public final Integer deckId;
+        public final Integer quantity;
 
         public CardRequestBody(String cardName, Integer deckId, Integer quantity) {
             this.cardName = cardName;
             this.deckId = deckId;
-            if (quantity == null) {
-                this.quantity = 1;
-            } else {
-                this.quantity = quantity;
-            }
+            this.quantity = Objects.requireNonNullElse(quantity, 1);
         }
     }
 

@@ -1,19 +1,23 @@
 package com.mays.mtgboostergame.deck;
 
+import com.mays.mtgboostergame.card.CardController;
 import com.mays.mtgboostergame.card.MyCard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.swing.text.html.Option;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.mays.mtgboostergame.card.CardController.*;
 import static com.mays.mtgboostergame.card.CardController.DTOCard;
 
 @NoArgsConstructor
@@ -80,6 +84,17 @@ public class DeckController {
         Optional<Deck> deck = deckService.get(id);
 
         return deck.map(value -> ResponseEntity.ok(new DTODeck(value))).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<DTODeck> removeCardFromDeck(@RequestBody CardRequestBody card) {
+        Optional<Deck> deck = deckService.update(card);
+        if (deck.isPresent()) {
+            Deck newDeck = deck.get();
+            return ResponseEntity.ok(new DTODeck(newDeck));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")

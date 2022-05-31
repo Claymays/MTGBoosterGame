@@ -69,12 +69,17 @@ public class CardController {
         public CardRequestBody(String cardName, Integer deckId, Integer quantity) {
             this.cardName = cardName;
             this.deckId = deckId;
-            this.quantity = Objects.requireNonNullElse(quantity, 1);
+            if (quantity != null) {
+                this.quantity = quantity;
+            } else {
+                this.quantity = 1;
+            }
         }
     }
 
     @PostMapping
     public ResponseEntity<DTOCard> addToDeck(@RequestBody CardRequestBody cardToAdd) {
+        System.out.println(cardToAdd.cardName + " " + cardToAdd.quantity);
         Optional<MyCard> optionalMyCard = cardService.addCardToDeck(cardToAdd);
         if (optionalMyCard.isPresent()) {
             DTOCard card = new DTOCard(optionalMyCard.get());

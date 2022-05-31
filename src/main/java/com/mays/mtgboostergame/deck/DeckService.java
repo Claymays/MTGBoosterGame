@@ -78,32 +78,47 @@ public class DeckService {
     public Optional<Deck> update(CardController.CardRequestBody cardRequestBody) {
         Optional<Deck> optDeck = deckRepository.findById(cardRequestBody.deckId);
         Deck deck;
+        MyCard card;
+        Deck newDeck;
+        int listedEntries = 0;
+
         if (optDeck.isPresent()) {
             deck = optDeck.get();
         } else {
             return Optional.empty();
         }
         List<MyCard> oldList = deck.getCardsInDeck();
+
         Optional<MyCard> optCard = cardService.getCardByName(cardRequestBody.cardName);
-        MyCard card;
-        int counter = 0;
+
 
         if (optCard.isPresent()) {
             card = optCard.get();
 
             for (MyCard listedCard : oldList) {
                 if (listedCard.getName().equals(card.getName())) {
-                    counter++;
-                    System.out.print(counter + " ");
+                    listedEntries++;
+                    System.out.print(listedEntries + " ");
                 }
             }
-            for (int i = counter; i > cardRequestBody.quantity; i--) {
-                oldList.remove(card);
-                System.out.print(oldList);
+
+            if (listedEntries > cardRequestBody.quantity) {
+                System.out.println("removing: " + card.getName() + " from deck: " + deck.getDeckName() + " " + ( listedEntries - cardRequestBody.quantity ) + " times");
+                for (int i = listedEntries; i > cardRequestBody.quantity; i--) {
+                    oldList.remove(card);
+                    System.out.print(oldList);
+                }
+            } else if (listedEntries < cardRequestBody.quantity) {
+                System.out.println("adding: " + card.getName() + " to deck: " + deck.getDeckName() + " " +  (cardRequestBody.quantity - listedEntries) + " times");
+                for (int i = listedEntries; i < cardRequestBody.quantity; i++) {
+                    oldList.add(card);
+                }
             }
+
             deck.setCardsInDeck(oldList);
-            Deck newDeck = deckRepository.save(deck);
+            newDeck = deckRepository.save(deck);
             return Optional.of(newDeck);
+
         } else {
             return Optional.empty();
         }

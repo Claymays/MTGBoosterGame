@@ -86,8 +86,9 @@ public class DeckController {
         return deck.map(value -> ResponseEntity.ok(new DTODeck(value))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping
-    public ResponseEntity<DTODeck> removeCardFromDeck(@RequestBody CardRequestBody card) {
+    @PostMapping("/update")
+    public ResponseEntity<DTODeck> updateCardsInDeck(@RequestBody CardRequestBody card) {
+        System.out.println(card);
         Optional<Deck> deck = deckService.update(card);
         if (deck.isPresent()) {
             Deck newDeck = deck.get();

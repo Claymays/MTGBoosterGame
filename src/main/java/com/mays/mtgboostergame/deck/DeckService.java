@@ -56,7 +56,7 @@ public class DeckService {
                 }
                 uncutCardName = scan.nextLine();
                 String cardName = uncutCardName.trim();
-                if (cardName.matches("Deck") || cardName.matches("Sideboard") || cardName.equals("")) {
+                if (cardName.matches("Deck") || cardName.matches("Sideboard") || cardName.equals("") || cardName.matches("Commander")) {
                     continue;
                 }
 

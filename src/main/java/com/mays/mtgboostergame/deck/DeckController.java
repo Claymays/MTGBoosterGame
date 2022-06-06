@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.swing.text.html.Option;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,7 +61,13 @@ public class DeckController {
         String deckName;
         String deckContent;
         public DeckRequestBody(String deckName, String deckContent) {
-            this.deckName = deckName;
+
+            if (Objects.equals(deckName, "")) {
+                this.deckName = SecurityContextHolder.getContext().getAuthentication().getName() + "'s new deck";
+            } else {
+                this.deckName = deckName;
+            }
+
             if (deckContent == null) {
                 this.deckContent = "";
             } else {
